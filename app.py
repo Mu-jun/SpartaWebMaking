@@ -3,6 +3,12 @@
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
+# DB 관련 주석
+# from pymongo import MongoClient
+# client = MongoClient('mongodb://test:test@localhost', 27017)
+# db = client.chacha
+
+
 @app.route('/')
 def home():
    return render_template('index.html')
