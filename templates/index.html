@@ -36,7 +36,7 @@
         <h1>차정보 입력하기 </h1>
     </div>
 
-    <div class='purchase'>
+    <div class='teainput'>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
@@ -46,33 +46,68 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">블렌드</span>
+                <label class="input-group-text" for="blend">블렌딩</label>
             </div>
-            <input type="text" id="blend" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <select class="custom-select" id="blend">
+                <option selected id="quantity">--이 차의 블렌딩 타입은?--</option>
+                <option value="스트레이트">스트레이트</option>
+                <option value="블렌디드">블렌디드</option>
+                <option value="플레이버드">플레이버드</option>
+            </select>
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">효능</span>
+                <label class="input-group-text" for="benefit">효능</label>
             </div>
-            <input type="text" id="benefit" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <select class="custom-select" id="benefit">
+                <option selected id="quantity">--이 차의 효능은?--</option>
+                <option value="다이어트">다이어트</option>
+                <option value="피부건강">피부건강</option>
+                <option value="피로회복">피로회복</option>
+                <option value="면역증진">면역증진</option>
+                <option value="힐링힐링">힐링힐링</option>
+            </select>
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">카페인</span>
+                <label class="input-group-text" for="decaf">카페인 함유여부</label>
+            </div>
+            <select class="custom-select" id="decaf">
+                <option selected id="decaf">--카페인 함유여부?--</option>
+                <option value="YES">YES</option>
+                <option value="NO">NO</option>
+            </select>
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량</span>
             </div>
             <input type="text" id="caffeine" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
         </div>
 
-         <div class="input-group mb-3">
+        <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">설명</span>
+                <span class="input-group-text" id="inputGroup-sizing-default">맛, 색, 향 등 설명</span>
             </div>
             <input type="text" id="desc" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
         </div>
 
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">주의사항</span>
+            </div>
+            <input type="text" id="caution" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
 
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">이미지 주소</span>
+            </div>
+            <input type="text" id="img" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
 
     </div>
 
@@ -88,10 +123,13 @@
 
     function save_tea() {
         let name = $('#name').val()
-        let blend = $('#blend').val()
-        let benefit = $('#benefit').val()
-        let caffeine = $('#caffeine').val()
+        let blend = $('#blend option:selected').val()
+        let benefit = $('#benefit option:selected').val()
+        let decaf = $('#decaf option:selected').val()
         let desc = $('#desc').val()
+        let caution = $('#caution').val()
+        let img = $('#img').val()
+        let caffeine = $('#caffeine').val()
 
 
 
@@ -102,8 +140,11 @@
                 name_give: name,
                 blend_give: blend,
                 benefit_give: benefit,
+                decaf_give: decaf,
                 caffeine_give: caffeine,
                 desc_give: desc,
+                caution_give: caution,
+                img_give: img,
             },
             success: function (response) { // 성공하면
                 alert(response["msg"]);
