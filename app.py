@@ -7,6 +7,8 @@ app = Flask(__name__)
 # client = MongoClient('mongodb://test:test@localhost', 27017)
 # db = client.chacha
 
+# feature_WJY: 브랜치 작업은 어떻게 하는 건지 test
+
 
 @app.route('/')
 def home():
