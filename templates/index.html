@@ -2,52 +2,121 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
+     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-            crossorigin="anonymous"></script>
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+
+    <meta property="og:title" content="차茶정해봅시다" />
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차" />
+    <meta property="og:image" content="{{ url_for('static', filename='ogimage.jpg') }}" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
     
-    <title>스파르타코딩클럽 | HTML 기초</title>
+    <title>차 정보 입력하기</title>
 </head>
 
 <body>
-    <!-- 구역을 나누는 태그들 -->
-    <div>나는 구역을 나누죠</div>
-    <p>나는 문단이에요</p>
-    <ul>
-        <li> bullet point!1 </li>
-        <li> bullet point!2 </li>
-    </ul>
 
-    <!-- 구역 내 콘텐츠 태그들 -->
-    <h1>h1은 제목을 나타내는 태그입니다. 페이지마다 하나씩 꼭 써주는 게 좋아요. 그래야 구글 검색이 잘 되거든요.</h1>
-    <h2>h2는 소제목입니다.</h2>
-    <h3>h3~h6도 각자의 역할이 있죠. 비중은 작지만..</h3>
-    <hr>
-    span 태그입니다: 특정 <span style="color:red">글자</span>를 꾸밀 때 써요
-    <hr>
-    a 태그입니다: <a href="http://naver.com/"> 하이퍼링크 </a>
-    <hr>
-    img 태그입니다: <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
-    <hr>
-    input 태그입니다: <input type="text" />
-    <hr>
-    button 태그입니다: <button> 버튼입니다</button>
-    <hr>
-    textarea 태그입니다: <textarea>나는 무엇일까요?</textarea>
+<div class = 'desc'>
+        <h1>차정보 입력하기 </h1>
+    </div>
+
+    <div class='purchase'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
+            </div>
+            <input type="text" id="name" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">블렌드</span>
+            </div>
+            <input type="text" id="blend" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">효능</span>
+            </div>
+            <input type="text" id="benefit" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">카페인</span>
+            </div>
+            <input type="text" id="caffeine" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+
+         <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">설명</span>
+            </div>
+            <input type="text" id="desc" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+        </div>
+
+
+
+    </div>
+
+    <button type="button" onclick="save_tea()" class="btn btn-primary btn-order">등록하기</button>
+
+
+
+<script>
+
+    $(document).ready(function () {
+
+    });
+
+    function save_tea() {
+        let name = $('#name').val()
+        let blend = $('#blend').val()
+        let benefit = $('#benefit').val()
+        let caffeine = $('#caffeine').val()
+        let desc = $('#desc').val()
+
+
+
+        $.ajax({
+            type: "POST",
+            url: "/save",
+            data: {
+                name_give: name,
+                blend_give: blend,
+                benefit_give: benefit,
+                caffeine_give: caffeine,
+                desc_give: desc,
+            },
+            success: function (response) { // 성공하면
+                alert(response["msg"]);
+                window.location.reload()
+            }
+        })
+    }
+
+
+
+</script>
+
+
 </body>
 
 </html>
