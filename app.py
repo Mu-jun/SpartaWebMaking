@@ -1,5 +1,4 @@
-#git push test wjy
-#git push test wjy sec.
+
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
 
