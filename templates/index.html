@@ -8,7 +8,7 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -19,37 +19,203 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
             integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
             crossorigin="anonymous"></script>
-    
-    <title>스파르타코딩클럽 | HTML 기초</title>
+
+
+    <meta property="og:title" content="차茶정해봅시다"/>
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차"/>
+    <meta property="og:image" content="{{ url_for('static', filename='ogimage.jpg') }}"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
+    <title>차 정보 입력하기</title>
+
+    <style>
+
+        .saveform {
+            width: 800px;
+            margin: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-save {
+            margin: auto;
+            margin-bottom: 50px;
+            width: 150px;
+            display: block;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .smalltitle {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .checkboxes {
+            margin-top: 7px;
+            margin-bottom: 7px;
+            margin-left: 10px;
+        }
+
+    </style>
+
 </head>
 
 <body>
-    <!-- 구역을 나누는 태그들 -->
-    <div>나는 구역을 나누죠</div>
-    <p>나는 문단이에요</p>
-    <ul>
-        <li> bullet point!1 </li>
-        <li> bullet point!2 </li>
-    </ul>
 
-    <!-- 구역 내 콘텐츠 태그들 -->
-    <h1>h1은 제목을 나타내는 태그입니다. 페이지마다 하나씩 꼭 써주는 게 좋아요. 그래야 구글 검색이 잘 되거든요.</h1>
-    <h2>h2는 소제목입니다.</h2>
-    <h3>h3~h6도 각자의 역할이 있죠. 비중은 작지만..</h3>
-    <hr>
-    span 태그입니다: 특정 <span style="color:red">글자</span>를 꾸밀 때 써요
-    <hr>
-    a 태그입니다: <a href="http://naver.com/"> 하이퍼링크 </a>
-    <hr>
-    img 태그입니다: <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" />
-    <hr>
-    input 태그입니다: <input type="text" />
-    <hr>
-    button 태그입니다: <button> 버튼입니다</button>
-    <hr>
-    textarea 태그입니다: <textarea>나는 무엇일까요?</textarea>
-    <hr>
-    p 태그입니다. <p>span 태그와 다르게 block 형식입니다. - 박채원 수정 </p>
+
+<div class="title">
+    <h1>차정보 입력하기</h1>
+</div>
+
+<div class="saveform">
+
+    <div class='teainput'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
+            </div>
+            <input type="text" id="name" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="smalltitle"><h5>대분류 3가지</h5></div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="blend">블렌딩</label>
+            </div>
+            <select class="custom-select" id="blend">
+                <option selected id="blend">--이 차의 블렌딩 타입은?--</option>
+                <option value="스트레이트">스트레이트</option>
+                <option value="블렌디드">블렌디드</option>
+                <option value="플레이버드">플레이버드</option>
+                <option value="기타">--기타--</option>
+            </select>
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">차의 효능 (복수선택가능)</span>
+            </div>
+
+            <div class = 'checkboxes'>
+            <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+            <input type='checkbox' name='benefit' value='피부건강'/> 피부건강
+            <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+            <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+            <input type='checkbox' name='benefit' value='힐링힐링'/> 힐링힐링
+            </div>
+
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
+            </div>
+            <div class = 'checkboxes'>카페인 함량을 입력하면 "0"(카페인 없음) 또는 "1"(카페인 함유)로 자동 저장됩니다.</div>
+
+        </div>
+
+        <div class="smalltitle"><h5>상세정보</h5></div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량</span>
+            </div>
+            <input type="number" id="caffeine" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">맛, 색, 향 등 설명</span>
+            </div>
+            <input type="text" id="desc" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">주의사항</span>
+            </div>
+            <input type="text" id="caution" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">이미지 주소</span>
+            </div>
+            <input type="text" id="img" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+    </div>
+
+</div>
+
+<button type="button" onclick="save_tea()" class="btn btn-primary btn-save">등록하기</button>
+
+<script>
+
+    $(document).ready(function () {
+
+    });
+
+    function save_tea() {
+
+        {#체크박스로 복수선택한 "효능"들을 모아주는 부분#}
+        const query = 'input[name="benefit"]:checked';
+        const selectedEls =
+            document.querySelectorAll(query);
+
+        let result = '';
+        selectedEls.forEach((el) => {
+            result += el.value + ' ';
+        });
+
+        let name = $('#name').val()
+        let blend = $('#blend option:selected').val()
+        let benefit = result
+        let desc = $('#desc').val()
+        let caution = $('#caution').val()
+        let img = $('#img').val()
+        let caffeine = Number($('#caffeine').val())
+        if (caffeine =="" || caffeine == 0){
+            var caffeineOX = 0
+        }else{
+            var caffeineOX = 1
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/save",
+            data: {
+                name_give: name,
+                blend_give: blend,
+                benefit_give: benefit,
+                caffeineOX_give: caffeineOX,
+                caffeine_give: caffeine,
+                desc_give: desc,
+                caution_give: caution,
+                img_give: img,
+            },
+            success: function (response) { // 성공하면
+                alert(response["msg"]);
+                window.location.reload()
+            }
+        })
+    }
+
+
+</script>
+
 </body>
 
 </html>
