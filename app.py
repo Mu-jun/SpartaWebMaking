@@ -1,3 +1,4 @@
+## 그냥 깃헙 테스트용 (머지 후 푸시해보기)
 
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
@@ -15,8 +16,8 @@ def save_tea():
     name_receive = request.form['name_give']             #차 이름입니다
     blend_receive = request.form['blend_give']           #대분류1 블렌딩
     benefit_receive = request.form['benefit_give']       #대분류2 효능
-    caffeineOX_receive = request.form['caffeineOX_give'] #대분류3 카페인 "함유여부"
-    caffeine_receive = request.form['caffeine_give']     #상세1 카페인 "함량"
+    caffeineOX_receive = int(request.form['caffeineOX_give']) #대분류3 카페인 "함유여부"
+    caffeine_receive = int(request.form['caffeine_give'])     #상세1 카페인 "함량"
     desc_receive = request.form['desc_give']             #상세2 맛 색 향 등
     caution_receive = request.form['caution_give']       #상세3 주의사항
     img_receive = request.form['img_give']               #상세4 이미지 주소
