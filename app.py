@@ -21,7 +21,6 @@ def save_tea():
     caution_receive = request.form['caution_give']       #상세3 주의사항
     img_receive = request.form['img_give']               #상세4 이미지 주소
 
-
     doc = {
         'name': name_receive,
         'blend': blend_receive,

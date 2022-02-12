@@ -117,7 +117,7 @@
             <div class="input-group-prepend">
                 <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
             </div>
-            <div class = 'checkboxes'>카페인 함량을 입력하면 Boolean type(true/false)로 자동 저장됩니다.</div>
+            <div class = 'checkboxes'>카페인 함량을 입력하면 "0"(카페인 없음) 또는 "1"(카페인 함유)로 자동 저장됩니다.</div>
 
         </div>
 
@@ -186,8 +186,11 @@
         let caution = $('#caution').val()
         let img = $('#img').val()
         let caffeine = Number($('#caffeine').val())
-        var caffeineOX = Boolean(caffeine) // 카페인 함유 여부 Boolean 형으로 입력
-
+        if (caffeine =="" || caffeine ==0){
+            var caffeineOX = 0
+        }else{
+            var caffeineOX = 1
+        }
 
         $.ajax({
             type: "POST",
