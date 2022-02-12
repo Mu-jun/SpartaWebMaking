@@ -114,14 +114,10 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <label class="input-group-text" for="decaf">카페인 함유여부</label>
+                <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
             </div>
-            <select class="custom-select" id="decaf">
-                <option selected id="decaf">--카페인 함유여부?--</option>
-                <option value="YES">YES</option>
-                <option value="NO">NO</option>
-                s
-            </select>
+            <div class = 'checkboxes'>카페인 함유여부(caffeineOX)는 카페인 함량을 입력하면 'YES' or 'NO'로 자동 저장됩니다.</div>
+
         </div>
 
         <div class="smalltitle"><h5>상세정보</h5></div>
@@ -182,10 +178,16 @@
             result += el.value + ' ';
         });
 
+        {#카페인 함유량을 입력받아서, 카페인 함유여부를 처리해주는 부분#}
+        if ($('#caffeine').val() == 0 || $('#caffeine').val() == ""){
+            var caffeineOX = "NO"
+        }else{
+            var caffeineOX = "YES"
+        }
+
         let name = $('#name').val()
         let blend = $('#blend option:selected').val()
         let benefit = result
-        let decaf = $('#decaf option:selected').val()
         let desc = $('#desc').val()
         let caution = $('#caution').val()
         let img = $('#img').val()
@@ -199,7 +201,7 @@
                 name_give: name,
                 blend_give: blend,
                 benefit_give: benefit,
-                decaf_give: decaf,
+                caffeineOX_give: caffeineOX,
                 caffeine_give: caffeine,
                 desc_give: desc,
                 caution_give: caution,

@@ -15,7 +15,7 @@ def save_tea():
     name_receive = request.form['name_give']             #차 이름입니다
     blend_receive = request.form['blend_give']           #대분류1 블렌딩
     benefit_receive = request.form['benefit_give']       #대분류2 효능
-    decaf_receive = request.form['decaf_give']           #대분류3 카페인 "함유여부"
+    caffeineOX_receive = request.form['caffeineOX_give'] #대분류3 카페인 "함유여부"
     caffeine_receive = request.form['caffeine_give']     #상세1 카페인 "함량"
     desc_receive = request.form['desc_give']             #상세2 맛 색 향 등
     caution_receive = request.form['caution_give']       #상세3 주의사항
@@ -26,7 +26,7 @@ def save_tea():
         'name': name_receive,
         'blend': blend_receive,
         'benefit': benefit_receive,
-        'decaf': decaf_receive,
+        'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
         'desc': desc_receive,
         'caution': caution_receive,
