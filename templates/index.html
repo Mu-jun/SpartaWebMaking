@@ -2,54 +2,95 @@
 <html lang="en">
 
 <head>
-     <!-- Required meta tags -->
+    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
-        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-        crossorigin="anonymous"></script>
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
 
 
-    <meta property="og:title" content="차茶정해봅시다" />
-    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차" />
-    <meta property="og:image" content="{{ url_for('static', filename='ogimage.jpg') }}" />
+    <meta property="og:title" content="차茶정해봅시다"/>
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차"/>
+    <meta property="og:image" content="{{ url_for('static', filename='ogimage.jpg') }}"/>
 
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
-    
+
     <title>차 정보 입력하기</title>
+
+    <style>
+
+        .saveform {
+            width: 800px;
+            margin: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-save {
+            margin: auto;
+            margin-bottom: 50px;
+            width: 150px;
+            display: block;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .smalltitle {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .checkboxes {
+            margin-top: 7px;
+            margin-bottom: 7px;
+            margin-left: 10px;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-<div class = 'desc'>
-        <h1>차정보 입력하기 </h1>
-    </div>
+<div class="title">
+    <h1>차정보 입력하기</h1>
+</div>
+
+<div class="saveform">
 
     <div class='teainput'>
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
             </div>
-            <input type="text" id="name" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" id="name" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
         </div>
+
+        <div class="smalltitle"><h5>대분류 3가지</h5></div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <label class="input-group-text" for="blend">블렌딩</label>
             </div>
             <select class="custom-select" id="blend">
-                <option selected id="quantity">--이 차의 블렌딩 타입은?--</option>
+                <option selected id="blend">--이 차의 블렌딩 타입은?--</option>
                 <option value="스트레이트">스트레이트</option>
                 <option value="블렌디드">블렌디드</option>
                 <option value="플레이버드">플레이버드</option>
@@ -58,16 +99,17 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <label class="input-group-text" for="benefit">효능</label>
+                <span class="input-group-text" id="basic-addon1">차의 효능 (복수선택가능)</span>
             </div>
-            <select class="custom-select" id="benefit">
-                <option selected id="quantity">--이 차의 효능은?--</option>
-                <option value="다이어트">다이어트</option>
-                <option value="피부건강">피부건강</option>
-                <option value="피로회복">피로회복</option>
-                <option value="면역증진">면역증진</option>
-                <option value="힐링힐링">힐링힐링</option>
-            </select>
+
+            <div class = 'checkboxes'>
+            <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+            <input type='checkbox' name='benefit' value='피부건강'/> 피부건강
+            <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+            <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+            <input type='checkbox' name='benefit' value='힐링힐링'/> 힐링힐링
+            </div>
+
         </div>
 
         <div class="input-group mb-3">
@@ -78,42 +120,49 @@
                 <option selected id="decaf">--카페인 함유여부?--</option>
                 <option value="YES">YES</option>
                 <option value="NO">NO</option>
+                s
             </select>
         </div>
+
+        <div class="smalltitle"><h5>상세정보</h5></div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량</span>
             </div>
-            <input type="text" id="caffeine" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" id="caffeine" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">맛, 색, 향 등 설명</span>
             </div>
-            <input type="text" id="desc" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" id="desc" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">주의사항</span>
             </div>
-            <input type="text" id="caution" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" id="caution" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">이미지 주소</span>
             </div>
-            <input type="text" id="img" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+            <input type="text" id="img" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
         </div>
 
     </div>
 
-    <button type="button" onclick="save_tea()" class="btn btn-primary btn-order">등록하기</button>
+</div>
 
-
+<button type="button" onclick="save_tea()" class="btn btn-primary btn-save">등록하기</button>
 
 <script>
 
@@ -122,15 +171,25 @@
     });
 
     function save_tea() {
+
+        {#체크박스로 복수선택한 "효능"들을 모아주는 부분#}
+        const query = 'input[name="benefit"]:checked';
+        const selectedEls =
+            document.querySelectorAll(query);
+
+        let result = '';
+        selectedEls.forEach((el) => {
+            result += el.value + ' ';
+        });
+
         let name = $('#name').val()
         let blend = $('#blend option:selected').val()
-        let benefit = $('#benefit option:selected').val()
+        let benefit = result
         let decaf = $('#decaf option:selected').val()
         let desc = $('#desc').val()
         let caution = $('#caution').val()
         let img = $('#img').val()
         let caffeine = $('#caffeine').val()
-
 
 
         $.ajax({
@@ -154,9 +213,7 @@
     }
 
 
-
 </script>
-
 
 </body>
 
