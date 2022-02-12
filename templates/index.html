@@ -116,7 +116,7 @@
             <div class="input-group-prepend">
                 <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
             </div>
-            <div class = 'checkboxes'>카페인 함유여부(caffeineOX)는 카페인 함량을 입력하면 'YES' or 'NO'로 자동 저장됩니다.</div>
+            <div class = 'checkboxes'>카페인 함량을 입력하면 Boolean type(true/false)로 자동 저장됩니다.</div>
 
         </div>
 
@@ -126,7 +126,7 @@
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량</span>
             </div>
-            <input type="text" id="caffeine" class="form-control" aria-label="Default"
+            <input type="number" id="caffeine" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
         </div>
 
@@ -178,20 +178,14 @@
             result += el.value + ' ';
         });
 
-        {#카페인 함유량을 입력받아서, 카페인 함유여부를 처리해주는 부분#}
-        if ($('#caffeine').val() == 0 || $('#caffeine').val() == ""){
-            var caffeineOX = "NO"
-        }else{
-            var caffeineOX = "YES"
-        }
-
         let name = $('#name').val()
         let blend = $('#blend option:selected').val()
         let benefit = result
         let desc = $('#desc').val()
         let caution = $('#caution').val()
         let img = $('#img').val()
-        let caffeine = $('#caffeine').val()
+        let caffeine = Number($('#caffeine').val())
+        var caffeineOX = Boolean(caffeine) // 카페인 함유 여부 Boolean 형으로 입력
 
 
         $.ajax({
