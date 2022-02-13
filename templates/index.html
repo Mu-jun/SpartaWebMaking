@@ -104,12 +104,12 @@
                 <span class="input-group-text" id="basic-addon1">차의 효능 (복수선택가능)</span>
             </div>
 
-            <div class = 'checkboxes'>
-            <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
-            <input type='checkbox' name='benefit' value='피부건강'/> 피부건강
-            <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
-            <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
-            <input type='checkbox' name='benefit' value='힐링힐링'/> 힐링힐링
+            <div class='checkboxes'>
+                <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+                <input type='checkbox' name='benefit' value='피부건강'/> 피부건강
+                <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+                <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+                <input type='checkbox' name='benefit' value='힐링힐링'/> 힐링힐링
             </div>
 
         </div>
@@ -118,7 +118,7 @@
             <div class="input-group-prepend">
                 <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
             </div>
-            <div class = 'checkboxes'>카페인 함량을 입력하면 "0"(카페인 없음) 또는 "1"(카페인 함유)로 자동 저장됩니다.</div>
+            <div class='checkboxes'>카페인 함량을 입력하면 "0"(카페인 없음) 또는 "1"(카페인 함유)로 자동 저장됩니다.</div>
 
         </div>
 
@@ -162,6 +162,8 @@
 
 <button type="button" onclick="save_tea()" class="btn btn-primary btn-save">등록하기</button>
 
+
+
 <script>
 
     $(document).ready(function () {
@@ -187,11 +189,13 @@
         let caution = $('#caution').val()
         let img = $('#img').val()
         let caffeine = Number($('#caffeine').val())
-        if (caffeine =="" || caffeine ==0){
-            var caffeineOX = 0
-        }else{
-            var caffeineOX = 1
+        let caffeineOX
+        if (caffeine == "" || caffeine == 0) {
+            caffeineOX = Number(0)
+        } else {
+            caffeineOX = Number(1)
         }
+
 
         $.ajax({
             type: "POST",
@@ -208,11 +212,11 @@
             },
             success: function (response) { // 성공하면
                 alert(response["msg"]);
-                window.location.reload()
+
             }
+
         })
     }
-
 
 </script>
 
