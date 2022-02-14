@@ -67,8 +67,16 @@
                     nickname_give: save_nick,
                 },
                 success: function (response) {
-                    alert(response["result"]);
-                    window.location.reload();
+
+                    if(response['fail']){
+                        alert(response["fail"]);
+                        window.location.reload();
+                    }
+                    else if(response['result'])
+                    {
+                        alert(response["result"]);
+                        window.location.reload();
+                    }
 
                 }
 

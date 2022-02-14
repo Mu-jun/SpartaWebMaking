@@ -1,33 +1,33 @@
-
 from flask import Flask, render_template, request, jsonify
 import hashlib
 import jwt
 import datetime
-import json
 
 app = Flask(__name__)
-app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
+app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 현상 해결코드
 
 # DB 관련
 from pymongo import MongoClient
+
 client = MongoClient('localhost', 27017)
 # client = MongoClient('localhost', 27017)
 db = client.dbchacha
+
 
 # 차 정보 입력하기(POST) API
 
 @app.route('/save', methods=['POST'])
 def save_tea():
     tea_receive = request.get_json()
-    name_receive = tea_receive['name_give']                              #차 이름입니다
-    type_receive = tea_receive['type_give']                              #대분류1 차의 종류
-    benefit_receive = tea_receive['benefit_give']                        #대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']                  #대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
-    caffeine_receive = tea_receive['caffeine_give']                      #상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']            #상세2 상세효능
-    desc_receive = tea_receive['desc_give']                              #상세2 상세설명
-    caution_receive = tea_receive['caution_give']                        #상세3 주의사항
-    img_receive = tea_receive['img_give']                                #상세4 이미지 주소
+    name_receive = tea_receive['name_give']  # 차 이름입니다
+    type_receive = tea_receive['type_give']  # 대분류1 차의 종류
+    benefit_receive = tea_receive['benefit_give']  # 대분류2 효능
+    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
+    caffeine_receive = tea_receive['caffeine_give']  # 상세1 카페인 "함량"
+    benefitdetail_receive = tea_receive['benefitdetail_give']  # 상세2 상세효능
+    desc_receive = tea_receive['desc_give']  # 상세2 상세설명
+    caution_receive = tea_receive['caution_give']  # 상세3 주의사항
+    img_receive = tea_receive['img_give']  # 상세4 이미지 주소
 
     doc = {
         'name': name_receive,
@@ -45,12 +45,14 @@ def save_tea():
 
     return jsonify({'msg': '차 등록이 완료되었습니다!'})
 
+
 @app.route('/')
 def home():
-   return render_template('save_tea.html')
+    return render_template('save_tea.html')
+
 
 # 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
-#***************************************************************************************************
+# ***************************************************************************************************
 
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
@@ -63,11 +65,15 @@ def api_register():
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
 
-    doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
+    result = db.user.find_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
 
-    db.user.insert_one(doc2)
+    if result is not None:
+        return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
+    else:
+        doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
+        db.user.insert_one(doc2)
+        return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
 
-    return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
 
 # [로그인 API]
 # id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
@@ -103,39 +109,40 @@ def api_login():
     else:
         return jsonify({'fail': '너 뭐 잘못 했냐?'})
 
+
 @app.route('/sign')
 def signup_page():
-   return render_template('01_login.html')
+    return render_template('01_login.html')
 
-#***************************************************************************************************
+
+# ***************************************************************************************************
 
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
-    
     id_receive = request.get_json()
-    
+
     result = db.user.find_one({'id': id_receive})
-    
+
     if result is not None:
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
         return jsonify({'success': '사용 가능한 ID입니다.'})
-    
+
+
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
-    
     nickname_receive = request.get_json()
-    
+
     result = db.user.find_one({'id': nickname_receive})
-    
+
     if result is not None:
         return jsonify({'fail': '사용할 수 없는 별명입니다.'})
     else:
         return jsonify({'success': '사용 가능한 별명입니다.'})
-        
+
 
 if __name__ == '__main__':
-   app.run('0.0.0.0',port=5000,debug=True)
+    app.run('0.0.0.0', port=5000, debug=True)
 
 """    #GET요청API코드
 @app.route('/test', methods=['GET'])
@@ -159,7 +166,7 @@ def test_post():
    title_receive = request.form['title_give']
    print(title_receive)
    return jsonify({'result':'success', 'msg': '이 요청은 POST!'})
-   
+
 #POST확인코드
 # $.ajax({
 #     type: "POST",
