@@ -107,6 +107,50 @@
             })
         }
 
+        function checkID() {
+            let id = $('#user_id').val();
+
+            console.log(id);
+
+            $.ajax({
+                type: "POST",
+                url: "/sign/checkID",
+                //dataType: "json",
+                headers: {'Content-Type': 'application/json'},
+                data: JSON.stringify(id),
+                success: function (response) {
+
+                    if(response["success"]) {
+                        alert(response["success"]);                   
+                    }
+                    else if(response["fail"]){
+                        alert(response["fail"]);                        
+                    }
+                }
+            })
+        }
+
+        function checkNickname() {
+            let nickname = $('#user_nick').val();
+            console.log(nickname)
+
+            $.ajax({
+                type: "POST",
+                url: "/sign/checkNickname",                
+                headers: {'Content-Type': 'application/json'},
+                data: JSON.stringify(nickname),
+                success: function (response) {
+
+                    if(response["success"]) {
+                        alert(response["success"]);                   
+                    }
+                    else if(response["fail"]){
+                        alert(response["fail"]);                        
+                    }
+                }
+            })
+        }
+
     </script>
 </head>
 <body>
@@ -117,8 +161,11 @@
     </div>
 
     <p>ID: <input type="text" id="user_id"/></p>
+    <button type="button" class="mybtn" onclick="checkID();">ID중복확인</button>
     <p>PW: <input type="password" id="user_pass"/></p>
     <p>NICKNAME: <input type="text" id="user_nick"/></p>
+    <button type="button" class="mybtn" onclick="checkNickname();">별명중복확인</button>
+    <p></p>
     <button type="button" class="mybtn" onclick="makeid();">가입하기</button>
     <button type="button" class="mybtn" onclick="login();">로그인하기</button>
 </div>
