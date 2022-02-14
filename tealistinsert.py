@@ -1,6 +1,6 @@
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
-#client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+#client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 db = client.dbchacha
 
 db.tealist.insert_many([
@@ -12,7 +12,7 @@ db.tealist.insert_many([
     "benefitdetail" : "혈압 강하,콜레스테롤 강하,우울증 개선,소화,면역력 증진",
     "desc" : "로젤 열매를 말린 후 끓여 우려낸 대용차. 빵이나 쿠키, 케이크와 어울리며 루비색의 빛깔이 아름답다. 새콤한 맛이며 쓴 맛이 별로 없다",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "임산부와 모유 수유중인 여성은 호르몬에 영향을 받기 때문에 유의가 필요하다",
     "img" : ""
 },
@@ -24,7 +24,7 @@ db.tealist.insert_many([
     "benefitdetail" : "항산화효과,암예방,철분흡수 도움,숙면유도",
     "desc" : "색감이 홍차와 유사해 홍차 대용품으로도 이용되었던 차. 때문에 가향 블렌딩이나 밀크티 등으로 즐기기도 한다. 둥글레차와 비슷한 맛에 설탕 없이조 약간의 단맛이 있으며 뒷맛이 개운하다",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "매우 물지만 과다 섭취시 에스트로겐 생성이 증가될 수 있다는 보고가 있다.",
     "img" : ""
 },
@@ -36,7 +36,7 @@ db.tealist.insert_many([
     "benefitdetail" : "고혈압 완화,간 건강,노폐물 배출,변비 개선,당뇨 개선,눈 건강",
     "desc" : "메밀을 볶아서 물을 붓고 끓인 대용차. 차게해서 먹거나 따뜻하게 해서 먹어도 달달한 맛이 있이 풍부하며 대표적인 무카페인·저칼로리 식품이다. ",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "몸이 찬 사람들에게는 설사나 유통을 유발할 수 있으며, 임산부 건강에 좋지 않다. 혈압이 낮은 사람에게도 좋지 않다.",
     "img" : ""
 }
@@ -48,7 +48,7 @@ db.tealist.insert_many([
     "benefitdetail" : "숙면유도,통증감소,혈당조절,항산화효과",
     "desc" : "카모마일은 데이지과의 식물로 '땅에서 나는 사과'라는 의미를 가지고 있다. 약 5천년전부터 약초로 사용해 온 식물로 꽃의 약효가 뛰어나다",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "알러지가 있을 수 있으며, 자궁 수축 부작용이 있을 수 있어 임신 중인 여성은 피해야 한다.",
     "img" : ""
 }
@@ -60,7 +60,7 @@ db.tealist.insert_many([
     "benefitdetail" : "혈압조절,지방간 개선,노화방지,눈 건강",
     "desc" : "구기자는 진시황이 불로초로 여겨 구했다는 설이 있으며, 남자의 양기에 좋다고 여겨져왔다. 구기자나무의 잎을 말려 차로 음용한다. 맛과 향은 다소 심심하여 오미자와 함께 끓여먹으면 좋다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "포도당과 아미노산의 흡수를 촉진하므로 과한 섭취시 체중이 늘 수 있다.",
     "img" : ""
 }
@@ -72,7 +72,7 @@ db.tealist.insert_many([
     "benefitdetail" : "뼈 건강,간 건강,항산화효과,당뇨,비뇨기질병,항암효과",
     "desc" : "민들레 꽃잎을 우려낸 대용차이다. 고소한 첫맛과 향긋한 끝맛의 풍미가 깊으며 여름에는 얼음을 넣고 시원하게 마시기도 한다. 비타민이 매우 풍부하여 항산화 작용이 탁월하다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "대체로 안전하나, 당뇨병약이나 혈액희석제, 변비약을 먹고 있다면 피할 필요가 있다.",
     "img" : ""
 }
@@ -84,7 +84,7 @@ db.tealist.insert_many([
     "benefitdetail" : "변비예방,체온조절,피부미용,항염효과",
     "desc" : "보리를 볶아 만든 대용차로, 식수 대용으로 가장 많이 사용된다. 특유의 구수한 맛이 익숙하다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "부작용이 거의 없지만 보리의 성질이 차기 때문에 몸이 찬 사람에게는 좋지 않을 수 있다.",
     "img" : ""
 }
@@ -96,7 +96,7 @@ db.tealist.insert_many([
     "benefitdetail" : "위장 건강,집중력 개선,눈 건강,구취제거,졸음방지,면역력 증진,진통",
     "desc" : "청량하고 시원한 향이 특징인 허브 종류 중 하나이다. 차로만 우려 마시는 것이 아니라 모히또나 에이드, 칵테일 등 여러 가지 음료와 주류에도 첨가 사용하고 있다. ",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "박하 알러지가 있을 수 있으며, 위 식도염류의 질환을 앓고 있는 사람에게 좋지 않다. 카페인이 없음에도 각성효과가 있으니 불면증에 유의해야 한다.",
     "img" : ""
 }
@@ -108,7 +108,7 @@ db.tealist.insert_many([
     "benefitdetail" : "혈류개선,항산화 효과,당뇨,항암,간 기능,호흡기,면역력 증진",
     "desc" : "오미자라는 이름은 그 열매에 다섯 가지의 기본 맛(신맛 쓴맛 짠맛 쓴맛 매운맛)이 모두 있다는 의미이다. 중국과 우리나라에서 오랫동안 약재로 사용해왔다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "당뇨병약을 먹고 있다면, 오미자의 혈당을 낮추는 효능이 약과 함께 작용하여 혈당을 너무 떨어뜨릴 수 있다.",
     "img" : ""
 }
@@ -120,7 +120,7 @@ db.tealist.insert_many([
     "benefitdetail" : "혈당수치 개선,위 건강,폐 건강,이뇨작용,부종완화,뼈 건강,항암,해열",
     "desc" : "볏과의 곡물인 율무 열매를 볶은 후 가루를 내어 즐기는 차이다. 본래 율무는 단백질과 미네랄이 풍부하여 다이어트에 도움을 줄 수 있지만 시중에 판매되는 율무차는 대부분 설탕의 함량이 매우 높으므로 주의하여야 한다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "자궁수축 작용이 있어 임신 초기에 섭취하면 유산의 위험이 있다고 한다. ",
     "img" : ""
 }
@@ -132,7 +132,7 @@ db.tealist.insert_many([
     "benefitdetail" : "시력증진, 이뇨작용, 고혈압, 위장병, 당뇨",
     "desc" : "눈 건강에 좋은 차로 유명하며 숙취 해소나 변비, 고혈압 등에도 효과가 있다. 음용수용 차로 많이 쓰이지만 보리차, 현미차와 달리 이뇨작용이 있기 때문에 수분 섭취에 도움이 되지 않아 권장할 수 없다. ",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "혈압을 낮추는 효과가 있기에 저혈압인 사람들에게는 좋지 않으며, 몸이 찬 사람에게도 좋지 않다고 한다. ",
     "img" : ""
 }
@@ -144,7 +144,7 @@ db.tealist.insert_many([
     "benefitdetail" : "혈압 강하,항염작용, 관절건강,숙면유도,노화방지",
     "desc" : "둥굴레차는 백합과 식물인 둥굴레의 뿌리로 만드는 차로, 뿌리 모양이 둥글고 굴레 모양의 마디가 있어 붙여진 이름이다. 이 뿌리를 말려 약재로 사용하기도 하는 등 건강에 좋은 차로 유명하며 구수한 맛도 좋아 즐기기에 편하다. ",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "장이 약한 사람은 설사나 속쓰림 증상이 있을 수 있으며, 백합과 식물에 알러지가 있는 경우 피하는 것이 좋다.",
     "img" : ""
 }
@@ -156,7 +156,7 @@ db.tealist.insert_many([
     "benefitdetail" : "소화촉진,변비 개선,노폐물 제거,고지혈증 예방",
     "desc" : "유자를 설탕이나 꿀에 절여 만든 유자청을 물에 희석하여 마시는 차. 비타민C가 풍부하여 감기에 마시는 차로 인기가 좋다. 은은한 단맛과 새콤하고 쌉싸름한 유자향을 즐길 수 있다. ",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "감기약의 성분이 비타민C를 만나면 해로운 성분으로 변하기에, 감기약과 함께 섭취한다면 한 시간 정도의 가격을 두고 섭취하는 것이 좋다. ",
     "img" : ""
 }
@@ -168,7 +168,7 @@ db.tealist.insert_many([
     "benefitdetail" : "소화촉진,감기,입덧방지,소염작용,위 건강,간 건강,기침완화,빈혈완화",
     "desc" : "모과 열매를 얇게 썰어서 말려두었다가 설탕에 절여 따뜻한 물에 넣어 마신다. 흔히 생강 조각을 함께 넣어 즐기기도 한다.",
     "caffeineOX" : False,
-    "caffeine" : 0,
+    "caffeine" : '0',
     "caution" : "설사를 완화하는 작용이 있어 변비를 일으키는 경우도 있으며, 위궤양이 있는 사람에게 좋지 않다.",
     "img" : ""
 }
