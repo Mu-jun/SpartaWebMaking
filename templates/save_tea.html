@@ -194,12 +194,8 @@
         let name = $('#name').val()
         let type = $('#type option:selected').val()
         let benefit = result
-        let caffeine = $('#caffeine').val()
-        if (caffeine == "" || caffeine == 0) {
-            var caffeineOX = 0
-        } else {
-            var caffeineOX = 1
-        }
+        let caffeine = ($('#caffeine').val())
+        var caffeineOX = Boolean(caffeine)
         let benefitdetail = $('#benefitdetail').val()
         let desc = $('#desc').val()
         let caution = $('#caution').val()
@@ -208,7 +204,9 @@
         $.ajax({
             type: "POST",
             url: "/save",
-            data: {
+            headers: {'Content-Type': 'application/json'},
+            dataType: 'json',
+            data: JSON.stringify({
                 name_give: name,
                 type_give: type,
                 benefit_give: benefit,
@@ -218,7 +216,7 @@
                 desc_give: desc,
                 caution_give: caution,
                 img_give: img,
-            },
+            }),
             success: function (response) { // 성공하면
                 alert(response["msg"]);
                 window.location.reload()
