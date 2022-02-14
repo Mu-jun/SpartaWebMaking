@@ -22,7 +22,7 @@ def save_tea():
     name_receive = tea_receive['name_give']  # 차 이름입니다
     type_receive = tea_receive['type_give']  # 대분류1 차의 종류
     benefit_receive = tea_receive['benefit_give']  # 대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
+    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" 없으면 False 있으면 True
     caffeine_receive = tea_receive['caffeine_give']  # 상세1 카페인 "함량"
     benefitdetail_receive = tea_receive['benefitdetail_give']  # 상세2 상세효능
     desc_receive = tea_receive['desc_give']  # 상세2 상세설명
