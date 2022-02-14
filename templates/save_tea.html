@@ -88,30 +88,34 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <label class="input-group-text" for="blend">블렌딩</label>
+                <label class="input-group-text" for="type">차의 분류</label>
             </div>
-            <select class="custom-select" id="blend">
-                <option selected id="blend">--이 차의 블렌딩 타입은?--</option>
-                <option value="스트레이트">스트레이트</option>
-                <option value="블렌디드">블렌디드</option>
-                <option value="플레이버드">플레이버드</option>
-                <option value="기타">--기타--</option>
+            <select class="custom-select" id="type">
+                <option selected id="type">--이 차의 분류는?--</option>
+                <option value="녹차">녹차</option>
+                <option value="백차">백차</option>
+                <option value="황차">황차</option>
+                <option value="청차">청차</option>
+                <option value="홍차">홍차</option>
+                <option value="흑차">흑차</option>
+                <option value="대용차">대용차</option>
             </select>
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="basic-addon1">차의 효능 (복수선택가능)</span>
+                <span class="input-group-text" id="basic-addon1">효능 (복수)</span>
             </div>
-
-            <div class = 'checkboxes'>
-            <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
-            <input type='checkbox' name='benefit' value='피부건강'/> 피부건강
-            <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
-            <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
-            <input type='checkbox' name='benefit' value='힐링힐링'/> 힐링힐링
+            <div class='checkboxes'>
+                <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+                <input type='checkbox' name='benefit' value='피부미용'/> 피부미용
+                <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+                <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+                <input type='checkbox' name='benefit' value='혈액순환'/> 혈액순환
+                <input type='checkbox' name='benefit' value='소화기능'/> 소화기능
+                <input type='checkbox' name='benefit' value='질병예방'/> 질병예방
+                <input type='checkbox' name='benefit' value='정신건강'/> 정신건강
             </div>
-
         </div>
 
         <div class="input-group mb-3">
@@ -126,15 +130,23 @@
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량</span>
+                <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량 (mg/200ml)</span>
             </div>
-            <input type="number" id="caffeine" class="form-control" aria-label="Default"
+            <input type="text" id="caffeine" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
         </div>
 
         <div class="input-group mb-3">
             <div class="input-group-prepend">
-                <span class="input-group-text" id="inputGroup-sizing-default">맛, 색, 향 등 설명</span>
+                <span class="input-group-text" id="inputGroup-sizing-default">상세 효능</span>
+            </div>
+            <input type="text" id="benefitdetail" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">상세 설명</span>
             </div>
             <input type="text" id="desc" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
@@ -170,7 +182,6 @@
 
     function save_tea() {
 
-        {#체크박스로 복수선택한 "효능"들을 모아주는 부분#}
         const query = 'input[name="benefit"]:checked';
         const selectedEls =
             document.querySelectorAll(query);
@@ -181,25 +192,27 @@
         });
 
         let name = $('#name').val()
-        let blend = $('#blend option:selected').val()
+        let type = $('#type option:selected').val()
         let benefit = result
+        let caffeine = $('#caffeine').val()
+        if (caffeine == "" || caffeine == 0) {
+            var caffeineOX = 0
+        } else {
+            var caffeineOX = 1
+        }
+        let benefitdetail = $('#benefitdetail').val()
         let desc = $('#desc').val()
         let caution = $('#caution').val()
         let img = $('#img').val()
-        let caffeine = Number($('#caffeine').val())
-        if (caffeine =="" || caffeine ==0){
-            var caffeineOX = 0
-        }else{
-            var caffeineOX = 1
-        }
 
         $.ajax({
             type: "POST",
             url: "/save",
             data: {
                 name_give: name,
-                blend_give: blend,
+                type_give: type,
                 benefit_give: benefit,
+                benefitdetail_give: benefitdetail,
                 caffeineOX_give: caffeineOX,
                 caffeine_give: caffeine,
                 desc_give: desc,
@@ -212,7 +225,6 @@
             }
         })
     }
-
 
 </script>
 

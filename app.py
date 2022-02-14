@@ -1,4 +1,3 @@
-## 그냥 깃헙 테스트용 (머지 후 푸시해보기)
 
 from flask import Flask, render_template, request, jsonify
 app = Flask(__name__)
@@ -13,21 +12,23 @@ db = client.dbchacha
 
 @app.route('/save', methods=['POST'])
 def save_tea():
-    name_receive = request.form['name_give']             #차 이름입니다
-    blend_receive = request.form['blend_give']           #대분류1 블렌딩
-    benefit_receive = request.form['benefit_give']       #대분류2 효능
-    caffeineOX_receive = int(request.form['caffeineOX_give']) #대분류3 카페인 "함유여부"
-    caffeine_receive = int(request.form['caffeine_give'])     #상세1 카페인 "함량"
-    desc_receive = request.form['desc_give']             #상세2 맛 색 향 등
-    caution_receive = request.form['caution_give']       #상세3 주의사항
-    img_receive = request.form['img_give']               #상세4 이미지 주소
+    name_receive = request.form['name_give']                              #차 이름입니다
+    type_receive = request.form['type_give']                              #대분류1 차의 종류
+    benefit_receive = request.form['benefit_give']                        #대분류2 효능
+    caffeineOX_receive = request.form['caffeineOX_give']                  #대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
+    caffeine_receive = request.form['caffeine_give']                      #상세1 카페인 "함량"
+    benefitdetail_receive = request.form['benefitdetail_give']            #상세2 상세효능
+    desc_receive = request.form['desc_give']                              #상세2 상세설명
+    caution_receive = request.form['caution_give']                        #상세3 주의사항
+    img_receive = request.form['img_give']                                #상세4 이미지 주소
 
     doc = {
         'name': name_receive,
-        'blend': blend_receive,
+        'type': type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
+        'benefitdetail': benefitdetail_receive,
         'desc': desc_receive,
         'caution': caution_receive,
         'img': img_receive,
@@ -39,7 +40,7 @@ def save_tea():
 
 @app.route('/')
 def home():
-   return render_template('index.html')
+   return render_template('save_tea.html')
 
 #GET요청API코드
 @app.route('/test', methods=['GET'])
