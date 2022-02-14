@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+
+    <meta property="og:title" content="차茶정해봅시다"/>
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차"/>
+    <meta property="og:image" content="{{ url_for('static', filename='ogimage.jpg') }}"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
+    <title>차 정보 입력하기</title>
+
+    <style>
+
+        .saveform {
+            width: 800px;
+            margin: auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .btn-save {
+            margin: auto;
+            margin-bottom: 50px;
+            width: 150px;
+            display: block;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .smalltitle {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .checkboxes {
+            margin-top: 7px;
+            margin-bottom: 7px;
+            margin-left: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="title">
+    <h1>차정보 입력하기</h1>
+</div>
+
+<div class="saveform">
+
+    <div class='teainput'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
+            </div>
+            <input type="text" id="name" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="smalltitle"><h5>대분류 3가지</h5></div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="type">차의 분류</label>
+            </div>
+            <select class="custom-select" id="type">
+                <option selected id="type">--이 차의 분류는?--</option>
+                <option value="녹차">녹차</option>
+                <option value="백차">백차</option>
+                <option value="황차">황차</option>
+                <option value="청차">청차</option>
+                <option value="홍차">홍차</option>
+                <option value="흑차">흑차</option>
+                <option value="대용차">대용차</option>
+            </select>
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">효능 (복수)</span>
+            </div>
+            <div class='checkboxes'>
+                <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+                <input type='checkbox' name='benefit' value='피부미용'/> 피부미용
+                <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+                <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+                <input type='checkbox' name='benefit' value='혈액순환'/> 혈액순환
+                <input type='checkbox' name='benefit' value='소화기능'/> 소화기능
+                <input type='checkbox' name='benefit' value='질병예방'/> 질병예방
+                <input type='checkbox' name='benefit' value='정신건강'/> 정신건강
+            </div>
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="caffeineOX">카페인 함유여부</label>
+            </div>
+            <div class = 'checkboxes'>카페인 함량을 입력하면 "0"(카페인 없음) 또는 "1"(카페인 함유)로 자동 저장됩니다.</div>
+
+        </div>
+
+        <div class="smalltitle"><h5>상세정보</h5></div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">카페인 함유량 (mg/200ml)</span>
+            </div>
+            <input type="text" id="caffeine" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">상세 효능</span>
+            </div>
+            <input type="text" id="benefitdetail" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">상세 설명</span>
+            </div>
+            <input type="text" id="desc" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">주의사항</span>
+            </div>
+            <input type="text" id="caution" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">이미지 주소</span>
+            </div>
+            <input type="text" id="img" class="form-control" aria-label="Default"
+                   aria-describedby="inputGroup-sizing-default">
+        </div>
+
+    </div>
+
+</div>
+
+<button type="button" onclick="save_tea()" class="btn btn-primary btn-save">등록하기</button>
+
+<script>
+
+    $(document).ready(function () {
+
+    });
+
+    function save_tea() {
+
+        const query = 'input[name="benefit"]:checked';
+        const selectedEls =
+            document.querySelectorAll(query);
+
+        let result = '';
+        selectedEls.forEach((el) => {
+            result += el.value + ' ';
+        });
+
+        let name = $('#name').val()
+        let type = $('#type option:selected').val()
+        let benefit = result
+        let caffeine = $('#caffeine').val()
+        var caffeineOX = Boolean(caffeine)
+        let benefitdetail = $('#benefitdetail').val()
+        let desc = $('#desc').val()
+        let caution = $('#caution').val()
+        let img = $('#img').val()
+
+        $.ajax({
+            type: "POST",
+            url: "/save",
+            headers: {'Content-Type': 'application/json'},
+            dataType: 'json',
+            data: JSON.stringify({
+                name_give: name,
+                type_give: type,
+                benefit_give: benefit,
+                benefitdetail_give: benefitdetail,
+                caffeineOX_give: caffeineOX,
+                caffeine_give: caffeine,
+                desc_give: desc,
+                caution_give: caution,
+                img_give: img,
+            }),
+            success: function (response) { // 성공하면
+                alert(response["msg"]);
+                window.location.reload()
+            }
+        })
+    }
+
+</script>
+
+</body>
+
+</html>
