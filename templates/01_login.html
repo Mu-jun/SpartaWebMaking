@@ -91,8 +91,16 @@
                     nickname_give: load_nick,
                 },
                 success: function (response) {
-                    alert(response["result"]);
-                    window.location.reload();
+
+                    if(response["success"]) {
+                        alert(response["success"]);
+                        let url_main = 'http://localhost:5000'
+                        window.location.replace(url_main);
+                    }
+                    else if(response["fail"]){
+                        alert(response["fail"]);
+                        window.location.reload();
+                    }
 
                 }
 
@@ -109,10 +117,10 @@
     </div>
 
     <p>ID: <input type="text" id="user_id"/></p>
-    <p>PW: <input type="text" id="user_pass"/></p>
+    <p>PW: <input type="password" id="user_pass"/></p>
     <p>NICKNAME: <input type="text" id="user_nick"/></p>
     <button type="button" class="mybtn" onclick="makeid();">가입하기</button>
-    <button type="button" class="mybtn" onclick="makeid();">로그인하기</button>
+    <button type="button" class="mybtn" onclick="login();">로그인하기</button>
 </div>
 </body>
 </html>

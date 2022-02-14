@@ -45,6 +45,9 @@ def save_tea():
 def home():
    return render_template('index.html')
 
+# 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
+#***************************************************************************************************
+
 # [회원가입 API]
 # id, pw, nickname을 받아서, mongoDB에 저장합니다.
 # 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
@@ -60,9 +63,8 @@ def api_register():
 
     db.user.insert_one(doc2)
 
-    return jsonify({'result': 'success'})
+    return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
 
-#*********************************************************************************************
 # [로그인 API]
 # id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
 @app.route('/sign/log_in', methods=['POST'])
@@ -86,19 +88,22 @@ def api_login():
             'id': id_receive,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
         }
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256').decode('utf-8')
+
+        SECRET_KEY = "I'M SECRET SEUNGSHIN BRO"
+
+        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
 
         # token을 줍니다.
-        return jsonify({'result': 'success', 'token': token})
+        return jsonify({'success': '어 그래 로그인 됐다. 와라.', 'token': token})
     # 찾지 못하면
     else:
-        return jsonify({'result': 'fail', 'msg': '아이디/비밀번호가 일치하지 않습니다.'})
-
-#***************************************************************************************************
+        return jsonify({'fail': '너 뭐 잘못 했냐?'})
 
 @app.route('/sign')
 def signup_page():
-   return render_template('01_login.html')    
+   return render_template('01_login.html')
+
+#***************************************************************************************************
 
 if __name__ == '__main__':
    app.run('0.0.0.0',port=5000,debug=True)
