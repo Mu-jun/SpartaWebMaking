@@ -17,20 +17,16 @@ db = client.dbchacha
 # 차 정보 입력하기(POST) API
 
 @app.route('/save', methods=['POST'])
-def save_tea():
-    print(request.is_json)
-    tea_receive = request.get_json()
-    print(tea_receive)
-    
-    name_receive = tea_receive['name_give']                              #차 이름입니다
-    type_receive = tea_receive['type_give']                              #대분류1 차의 종류
-    benefit_receive = tea_receive['benefit_give']                        #대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']                  #대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
-    caffeine_receive = tea_receive['caffeine_give']                      #상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']            #상세2 상세효능
-    desc_receive = tea_receive['desc_give']                              #상세2 상세설명
-    caution_receive = tea_receive['caution_give']                        #상세3 주의사항
-    img_receive = tea_receive['img_give']                                #상세4 이미지 주소
+def save_tea():    
+    name_receive = request.form['name_give']                              #차 이름입니다
+    type_receive = request.form['type_give']                              #대분류1 차의 종류
+    benefit_receive = request.form['benefit_give']                        #대분류2 효능
+    caffeineOX_receive = request.form['caffeineOX_give']                  #대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
+    caffeine_receive = request.form['caffeine_give']                      #상세1 카페인 "함량"
+    benefitdetail_receive = request.form['benefitdetail_give']            #상세2 상세효능
+    desc_receive = request.form['desc_give']                              #상세2 상세설명
+    caution_receive = request.form['caution_give']                        #상세3 주의사항
+    img_receive = request.form['img_give']                                #상세4 이미지 주소
 
     doc = {
         'name': name_receive,
