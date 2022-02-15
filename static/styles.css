@@ -1,3 +1,5 @@
+        /* 01_login style */
+
         * {
             font-family: 'Black Han Sans', sans-serif;
         }
@@ -27,4 +29,23 @@
             width: 100px;
             margin: auto;
             display: block;
+        }
+
+        /* get_tea style */
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        #box{
+            background-color: beige;
+            margin: 20px;
+        }
+
+        .input-box{
+            margin-left: 100px;
+            margin-right: 100px;
+            margin-top: 30px;
         }

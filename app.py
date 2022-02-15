@@ -1,3 +1,5 @@
+import secrets
+
 from flask import Flask, render_template, request, jsonify
 import hashlib
 import jwt
@@ -9,9 +11,14 @@ app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 현상 해결코드
 # DB 관련
 from pymongo import MongoClient
 
-client = MongoClient('localhost', 27017)
+# 서버 db 사용시 로컬 db 주석 처리, 로컬 db 사용시 서버 db 주석 처리
+# **********************************************************
+
 # client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 db = client.dbchacha
+
+# **********************************************************
 
 
 # 차 정보 입력하기(POST) API
@@ -50,6 +57,18 @@ def save_tea():
 def home():
     return render_template('save_tea.html')
 
+# 티 정보 GET 하기 -- 영은
+# ***************************************************************************************************
+@app.route('/tea/list', methods=['GET'])
+def getTea():
+    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    return jsonify({'all_teas':tea_list})
+
+@app.route('/tea')
+def teaList():
+    return render_template('get_tea.html')
+# ***************************************************************************************************
+
 
 # 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
 # ***************************************************************************************************
@@ -62,15 +81,17 @@ def api_register():
     id_receive = request.form['id_give']
     pw_receive = request.form['pw_give']
     nickname_receive = request.form['nickname_give']
+    salt = secrets.token_bytes(32)
+    pw_salt = pw_receive+salt
 
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
+    pw_hash = hashlib.sha256(pw_salt.encode('utf-8')).hexdigest()
 
     result = db.user.find_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
 
     if result is not None:
         return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
     else:
-        doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
+        doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive, 'saltValue': salt}
         db.user.insert_one(doc2)
         return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
 
@@ -90,7 +111,7 @@ def api_login():
 
     # 찾으면 JWT 토큰을 만들어 발급합니다.
     if result is not None:
-        # JWT 토큰에는, payload와 시크릿키가 필요합니다.
+        # JWT 토큰에는, payload와 시크릿키가 필요합니다.방법
         # 시크릿키가 있어야 토큰을 디코딩(=풀기) 해서 payload 값을 볼 수 있습니다.
         # 아래에선 id와 exp를 담았습니다. 즉, JWT 토큰을 풀면 유저ID 값을 알 수 있습니다.
         # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.

@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+
+    <meta property="og:title" content="차茶정해봅시다"/>
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차"/>
+    <meta property="og:image" content="/static/ogimage.jpg"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
+    <title>차 정보 가져오기</title>
+
+    <link rel="stylesheet" href="../static/styles.css" />
+    <script src="../static/script/script.js"></script>
+</head>
+
+
+<body>
+
+<div class="title">
+    <h1>차정보 가져오기</h1>
+</div>
+
+   <!--검색창 추가-->
+    <div class='input-box'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
+            </div>
+                <input type="text" id="teaName" class="form-control kw" onkeyup="enter()">
+                <button onclick="search()" class="btn btn-outline-secondary" type="button" id="btn_search" href="javascript:enter();">찾기</button>
+            </div>
+    </div>
+
+    <div id="box">
+
+    </div>
+
+
+</body>
+
+</html>

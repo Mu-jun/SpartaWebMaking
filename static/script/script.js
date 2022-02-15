@@ -1,3 +1,5 @@
+        /* 01_login script */
+
 
         $(document).ready(function () {
 
@@ -70,6 +72,11 @@
         function checkID() {
             let id = $('#user_id').val();
 
+            if ($('#user_id').val() == '') {
+                alert('ID를 입력해라.')
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "/sign/checkID",
@@ -91,6 +98,11 @@
         function checkNickname() {
             let nickname = $('#user_nick').val();
 
+            if ($('#user_nick').val() == '') {
+                alert('닉네임을 입력해라.')
+                return;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "/sign/checkNickname",
@@ -106,4 +118,87 @@
                     }
                 }
             })
+        }
+
+        /* get_tea script */
+
+         $(document).ready(function () {
+            showTea();
+        });
+
+        // 이름순 정렬
+        function showTea() {
+            $.ajax({
+                type: "GET",
+                url: "/tea/list",
+                data: {},
+                success: function (response) {
+                    let Tea = response['all_teas']
+                    for(let i =0; i<Tea.length; i++){
+                        let name = Tea[i]['name']
+                        let type = Tea[i]['type']
+                        let benefit = Tea[i]['benefit']
+                        let caffeineOX = Tea[i]['caffeineOX']
+                        let caffeine = Tea[i]['caffeine']
+                        let benefitdetail = Tea[i]['benefitdetail']
+                        let desc = Tea[i]['desc']
+                        let caution = Tea[i]['caution']
+                        let img = Tea[i]['lmg']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        // 검색 기능
+        function search(){
+            $.ajax({
+                type: "GET",
+                url: "/tea/list",
+                data: {},
+                success: function (response) {
+                    $('#box').empty()
+                    let teaKeyword = $('#teaName').val();
+                    let Tea = response['all_teas']
+
+                    for(let i =0; i<Tea.length; i++){
+                        if(Tea[i]['name']==teaKeyword) {
+                            let name = Tea[i]['name']
+                            let type = Tea[i]['type']
+                            let benefit = Tea[i]['benefit']
+                            let caffeineOX = Tea[i]['caffeineOX']
+                            let caffeine = Tea[i]['caffeine']
+                            let benefitdetail = Tea[i]['benefitdetail']
+                            let desc = Tea[i]['desc']
+                            let caution = Tea[i]['caution']
+                            let img = Tea[i]['lmg']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                        }
+                }}
+            })
+        }
+
+        // enter 키 검색
+        function enter() {
+            if (window.event.keyCode == 13) {
+                search();
+            }
         }
