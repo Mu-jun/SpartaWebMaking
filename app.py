@@ -9,6 +9,11 @@ import chachaconfig
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
+app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
+app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
+
+jwt = JWTManager(app)
 
 # DB 관련
 from pymongo import MongoClient
@@ -118,7 +123,7 @@ def signup_page():
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
     
-    id_receive = request.get_json()
+    id_receive = request.get_json().upper()
     
     result = db.users.find_one({'id': id_receive})
     
@@ -130,7 +135,7 @@ def checkID():
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
     
-    nickname_receive = request.get_json()
+    nickname_receive = request.get_json().upper()
     
     result = db.users.find_one({'id': nickname_receive})
     
@@ -152,14 +157,12 @@ def hash_pass(password, id):
 @app.route('/sign/signup_test', methods=['POST'])
 def signup():
     
-    id_receive = request.form['id_give']
+    id_receive = request.form['id_give'].upper()
     pass_receive = request.form['pass_give']
-    nickname_receive = request.form['nickname_give']
+    nickname_receive = request.form['nickname_give'].upper()
     
     hashed_password = hash_pass(pass_receive,id_receive)
-    
-    print(hashed_password)
-    
+           
     doc = {
         'id': id_receive,
         'password': hashed_password,
@@ -171,20 +174,63 @@ def signup():
     
     return jsonify({'success': '가입완료!'})
 
-@app.route('/sign/signin', methods=['POST'])
+@app.route('/sign/signin_test', methods=['POST'])
 def api_signin():
     
-    return jsonify({'success':'환영합니다.'})
+    id_receive = request.form['id_give'].upper()
+    pass_receive = request.form['pass_give']
+    
+    hashed_password = hash_pass(pass_receive,id_receive)
+    
+    user = db.users.find_one({'id':id_receive})
+    
+    print(user)
+    
+    if(hashed_password == user['password']):
+        access_token = create_access_token(identity=user['id'])
+        refresh_token = create_refresh_token(identity=user['id'])
+    
+        return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
+    else:
+        return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
 
 @app.route('/sign/change_pass', methods=['POST'])
+@jwt_required
 def api_change_pass():
+    current_user = get_jwt_identity()
     
-    return jsonify({'success':'비밀번호가 변경되었습니다.'})
+    print(type(current_user))
+    print(current_user)
+    
+    pass_receive = request.form['pass_give']
+    new_password = request.form['new_pass_give']
+    
+    hashed_password = hash_pass(pass_receive,current_user)
+    new_password = hash_pass(new_password,current_user)
+    
+    user = db.users.find_one({'id':current_user})
+    
+    print(user)
+    
+    if(hashed_password == user['password']):
+        db.users.update_one({'id':current_user},{'$set':{'password':new_password}})    
+        return jsonify({'success':'비밀번호가 변경되었습니다.'})
+    else:
+        return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
 
-@app.route('/sign/delete_user', methods=['POST'])
-def api_delete_user():
+# @app.route('/sign/delete_user', methods=['POST'])
+# @jwt_required
+# def api_delete_user():
+#     current_user = get_jwt_identity()
     
-    return jsonify({'success':'회원탈퇴완료'})
+#     return jsonify({'success':'회원탈퇴완료'})
+
+@app.route('/refresh', methods=['GET'])
+@jwt_required(refresh=True)
+def refresh():
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=current_user)
+    return jsonify(access_token=access_token, current_user=current_user)
 
 @app.route('/sign_test')
 def sign_page():

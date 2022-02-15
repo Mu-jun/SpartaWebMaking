@@ -16,6 +16,10 @@
         
     <script>
 
+        $(document).ready(function () {
+            check_token();            
+        });
+
         let isPassibleID = false;
 
         function changeID() {
@@ -95,10 +99,11 @@
                         nickname_give: nickname
                     },
                     success: function(response){
-                        if(response['success']) alert(response['success']);
-                        else alert('가입실패')
-                        
-                        window.location.reload();
+                        if(response['success']) {
+                            alert(response['success']);
+                            window.location.reload();
+                        } 
+                        else alert('가입실패')                        
                     }
                 })
 
@@ -117,10 +122,120 @@
         }
 
         function test_signin() {
+            let id = $('#signin_id').val();
+            let pass = $('#signin_pass').val();
+            
+            $.ajax({
+                type: "POST",
+                url: "/sign/signin_test",
+                data: { 
+                    id_give: id,
+                    pass_give: pass,                    
+                },
+                success: function(response){
+                    if(response['success']) {
+                        alert(response['success']);
+                        insert_token(response['access_token'],response['refresh_token'])
+                        window.location.reload();
+                    } 
+                    else alert(response['fail'])
+                }
+            })
+        }
 
+        function insert_token(access_token,refresh_token) {
+            localStorage.setItem('chachaRefreshToken', refresh_token)
+            sessionStorage.setItem('chachaAccessToken', access_token)
+        }
+
+        function get_payload_exp(token) {
+
+            let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
+            let payload = atob(base64Payload).split(',')[6].split(':')[1].split('}')[0];
+
+            return +payload;
+        }
+
+        function check_token() {
+
+            let date = new Date();
+            let numberic_date = parseInt(date/1000)
+
+            console.log(numberic_date);
+
+            let access_token = sessionStorage.getItem('chachaAccessToken');
+            let access_payload_exp = get_payload_exp(access_token);
+            
+            console.log(access_payload_exp);
+
+            if(access_payload_exp > numberic_date) {
+                $('#singupPage').hide();
+                $('#singinPage').hide();
+            } else {
+                let refresh_token = localStorage.getItem('chachaRefreshToken');                
+                let refresh_payload_exp = get_payload_exp(refresh_token);
+                
+                console.log(refresh_payload_exp);
+
+                if(refresh_payload_exp > numberic_date) {
+                    $.ajax({
+                        type: "GET",
+                        url: "/refresh",
+                        headers: {"Authorization": "Bearer "+ refresh_token},
+                        success: function(response){
+                            insert_token(response['access_token'],response['refresh_token'])
+                        }
+                    })
+                } else {
+                    $('#singupPage').show();
+                    $('#singinPage').show();
+                }
+
+            }
+        }
+
+        let isPassiblePassword = false;
+
+        function check_change_password() {
+            isPassiblePassword = false;
+
+            let new_pass = $('#new_pass').val();
+            let new_pass_check = $('#new_pass_check').val();
+
+            if(new_pass === new_pass_check) {
+                isPassiblePassword = true;
+                $('#checkPasswordText').text('새로운 비밀번호 확인 완료')
+            } else {
+                $('#checkPasswordText').text('새로운 비밀번호를 확인해 주세요.')
+            }
         }
 
         function test_change_pass() {
+            if(isPassiblePassword) {
+                let current_pass = $('#current_pass').val();
+                let new_pass = $('#new_pass').val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/sign/change_pass",
+                    data: {                        
+                        pass_give: current_pass,
+                        new_pass_give: new_pass                    
+                    },
+                    success: function(response){
+                        if(response['success']) {
+                            alert(response['success']);
+                            window.location.reload();
+                        } 
+                        else if(response['fail']) {
+                            alert(response['fail']);
+                            window.location.reload();
+                        }
+                    }
+                })
+            }else {
+                alert('새로운 비밀번호를 확인해 주세요.')
+            }
 
         }
 
@@ -132,7 +247,7 @@
 </head>
 <body>
 <div>
-    <div>
+    <div id='singupPage'>
         <h1>회원가입 페이지</h1>
         <h5>아이디, 패스워드, 별명을 입력해주세요</h5>
 
@@ -143,7 +258,7 @@
         <p id="checkNicknameText"></p>            
         <button type="button" onclick="test_signup();">가입하기</button>
     </div>
-    <div>
+    <div id='singinPage'>
         <h1>로그인 페이지</h1>
         <h5>아이디, 패스워드를 입력해주세요</h5>
 
@@ -159,9 +274,9 @@
 
         <p>기본 비밀번호: <input type="text" id="current_pass"/></p>
         
-        <p>새로운 비밀번호: <input type="password" id="new_pass"/></p>
-        <p>새로운 비밀번호확인: <input type="password" id="new_pass_check"/></p>
-        <p id="pass_check_text"></p>
+        <p>새로운 비밀번호: <input type="password" id="new_pass" oninput="check_change_password();"/></p>
+        <p>새로운 비밀번호확인: <input type="password" id="new_pass_check" oninput="check_change_password();"/></p>
+        <p id="checkPasswordText"></p>
         <button type="button" onclick="test_change_pass();">변경하기</button>
     </div>
     <div>
