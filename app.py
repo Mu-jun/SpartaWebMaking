@@ -11,11 +11,13 @@ app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 현상 해결코드
 # DB 관련
 from pymongo import MongoClient
 
+
 # 서버 db 사용시 로컬 db 주석 처리, 로컬 db 사용시 서버 db 주석 처리
 # **********************************************************
 
 # client = MongoClient('localhost', 27017)
 client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+
 db = client.dbchacha
 
 # **********************************************************
@@ -26,19 +28,23 @@ db = client.dbchacha
 @app.route('/save', methods=['POST'])
 def save_tea():
     tea_receive = request.get_json()
-    name_receive = tea_receive['name_give']  # 차 이름입니다
-    type_receive = tea_receive['type_give']  # 대분류1 차의 종류
-    benefit_receive = tea_receive['benefit_give']  # 대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" 없으면 False 있으면 True
-    caffeine_receive = tea_receive['caffeine_give']  # 상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']  # 상세2 상세효능
-    desc_receive = tea_receive['desc_give']  # 상세2 상세설명
-    caution_receive = tea_receive['caution_give']  # 상세3 주의사항
-    img_receive = tea_receive['img_give']  # 상세4 이미지 주소
+    name_receive = tea_receive['name_give']                   # 차 이름입니다
+    eng_name_receive = tea_receive['eng_name_give']           # (영문)차 이름입니다
+    type_receive = tea_receive['type_give']                   # 대분류1 종류
+    eng_type_receive = tea_receive['eng_type_give']           # 대분류1 (영문)종류 - 종류 선택시 자동 입력
+    benefit_receive = tea_receive['benefit_give']             # 대분류2 효능
+    caffeineOX_receive = tea_receive['caffeineOX_give']       # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
+    caffeine_receive = tea_receive['caffeine_give']           # 상세1 카페인 "함량"
+    benefitdetail_receive = tea_receive['benefitdetail_give'] # 상세2 상세효능
+    desc_receive = tea_receive['desc_give']                   # 상세2 상세설명
+    caution_receive = tea_receive['caution_give']             # 상세3 주의사항
+    img_receive = tea_receive['img_give']                     # 상세4 이미지 주소
 
     doc = {
         'name': name_receive,
+        'eng_name': eng_name_receive,
         'type': type_receive,
+        'eng_type': eng_type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
