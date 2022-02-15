@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+
+    <title>로그인페이지</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/styles.css" />
+        
+    <script>
+
+        let isPassibleID = false;
+
+        function changeID() {
+            isPassibleID = false;
+            $('#checkIDText').text('중복확인해주세요');
+        }
+
+        function checkID() {
+            let id = $('#signup_id').val();
+
+            $.ajax({
+                type: "POST",
+                url: "/sign/checkID",
+                //dataType: "json",
+                headers: {'Content-Type': 'application/json'},
+                data: JSON.stringify(id),
+                success: function (response) {
+
+                    if(response["success"]) {
+                        alert(response["success"]);
+                        isPassibleID = true;
+                        $('#checkIDText').text('중복확인완료');
+                    }
+                    else if(response["fail"]){
+                        alert(response["fail"]);                        
+                    }                    
+                }
+            })
+        }
+
+        let isPassibleNickname = false;
+
+        function changeNickname() {
+            isPassibleNickname = false;
+            $('#checkNicknameText').text('중복확인해주세요');
+        }
+
+        function checkNickname() {
+            
+            let nickname = $('#signup_nick').val();
+
+            $.ajax({
+                type: "POST",
+                url: "/sign/checkNickname",
+                headers: {'Content-Type': 'application/json'},
+                data: JSON.stringify(nickname),
+                success: function (response) {
+
+                    if(response["success"]) {
+                        alert(response["success"]);    
+                        isPassibleNickname = true; 
+                        $('#checkNicknameText').text('중복확인완료');
+                    }
+                    else if(response["fail"]){
+                        alert(response["fail"]);                        
+                    }                    
+                }
+            })
+            
+        }
+
+        function test_signup() {
+
+            if(isPassibleID&&isPassibleNickname) {
+
+                let id = $('#signup_id').val();
+                let pass = $('#signup_pass').val();
+                let nickname = $('#signup_nick').val();
+                //let encrypt_pass = hash_pass(pass);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/sign/signup_test",
+                    data: { 
+                        id_give: id,
+                        pass_give: pass,
+                        nickname_give: nickname
+                    },
+                    success: function(response){
+                        if(response['success']) alert(response['success']);
+                        else alert('가입실패')
+                        
+                        window.location.reload();
+                    }
+                })
+
+            } else {
+                alert('ID와 별명 중복확인 바랍니다.');
+            }
+
+        }
+
+        function hash_pass(pass) {
+
+            let result = CryptoJS.SHA512(pass+"kd7baw5v6ru");
+            console.log(result);
+
+            return result;
+        }
+
+        function test_signin() {
+
+        }
+
+        function test_change_pass() {
+
+        }
+
+        function test_delete_user() {
+
+        }
+
+    </script>
+</head>
+<body>
+<div>
+    <div>
+        <h1>회원가입 페이지</h1>
+        <h5>아이디, 패스워드, 별명을 입력해주세요</h5>
+
+        <p>ID: <input type="text" id="signup_id" oninput="changeID()"/><button type="button" onclick="checkID();">ID중복확인</button></p>        
+        <p id="checkIDText"></p>
+        <p>PW: <input type="password" id="signup_pass"/></p>
+        <p>NICKNAME: <input type="text" id="signup_nick" oninput="changeNickname()"/><button type="button" onclick="checkNickname();">별명중복확인</button></p>
+        <p id="checkNicknameText"></p>            
+        <button type="button" onclick="test_signup();">가입하기</button>
+    </div>
+    <div>
+        <h1>로그인 페이지</h1>
+        <h5>아이디, 패스워드를 입력해주세요</h5>
+
+        <p>ID: <input type="text" id="signin_id"/></p>
+        
+        <p>PW: <input type="password" id="signin_pass"/></p>
+        
+        <button type="button" onclick="test_signin();">로그인하기</button>
+    </div>
+    <div>
+        <h1>비밀변호 변경 페이지</h1>
+        <h5>기존 비밀번호와 새로운 비밀번호를 입력해주세요</h5>
+
+        <p>기본 비밀번호: <input type="text" id="current_pass"/></p>
+        
+        <p>새로운 비밀번호: <input type="password" id="new_pass"/></p>
+        <p>새로운 비밀번호확인: <input type="password" id="new_pass_check"/></p>
+        <p id="pass_check_text"></p>
+        <button type="button" onclick="test_change_pass();">변경하기</button>
+    </div>
+    <div>
+        <h1>회원탈퇴 페이지</h1>
+        <h5>패스워드를 입력해주세요</h5>
+
+        <p>ID: <input type="text" id="user_id"/></p>
+        
+        <p>PW: <input type="password" id="user_pass"/></p>
+        
+        <button type="button" onclick="test_delete_user();">로그인하기</button>
+    </div>
+</div>
+</body>
+</html>

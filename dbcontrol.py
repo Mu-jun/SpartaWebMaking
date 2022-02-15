@@ -2,6 +2,16 @@ from pymongo import MongoClient
 client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 db = client.dbchacha
 
+# # 저장 - 예시
+# doc = {'name':'bobby','age':21}
+# db.users.insert_one(doc)
+
+# # 한 개 찾기 - 예시
+# user = db.users.find_one({'name':'bobby'})
+
+# # 여러개 찾기 - 예시 ( _id 값은 제외하고 출력)
+# same_ages = list(db.users.find({'age':21},{'_id':False}))
+
 # # 바꾸기 - 예시
 # db.users.update_one({'name':'bobby'},{'$set':{'age':19}})
 # #여러개를 바꿀 때는 update_many가 있지만 위험해서 잘 쓰지 않는다.

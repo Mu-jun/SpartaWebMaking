@@ -35,7 +35,7 @@
             })
         }
 
-                function login() {
+        function login() {
 
             let load_id = $('#user_id').val()
             let load_pass = $('#user_pass').val()
@@ -79,11 +79,11 @@
                 success: function (response) {
 
                     if(response["success"]) {
-                        alert(response["success"]);
+                        alert(response["success"]);                        
                     }
                     else if(response["fail"]){
                         alert(response["fail"]);
-                    }
+                    }                    
                 }
             })
         }
@@ -99,11 +99,12 @@
                 success: function (response) {
 
                     if(response["success"]) {
-                        alert(response["success"]);
+                        alert(response["success"]);                        
                     }
                     else if(response["fail"]){
-                        alert(response["fail"]);
-                    }
+                        alert(response["fail"]);                        
+                    }                    
                 }
             })
+            
         }
