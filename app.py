@@ -55,6 +55,17 @@ def home():
     return render_template('save_tea.html')
 
 
+# 티 정보 GET 하기 -- 영은
+@app.route('/tea/list', methods=['GET'])
+def getTea():
+    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    return jsonify({'all_teas':tea_list})
+
+@app.route('/tea')
+def teaList():
+    return render_template('get_tea.html')
+
+
 # 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
 # ***************************************************************************************************
 
