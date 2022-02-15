@@ -29,7 +29,7 @@ db = client.dbchacha
 def save_tea():
     tea_receive = request.get_json()
     name_receive = tea_receive['name_give']                   # 차 이름입니다
-    eng_name_receive = tea_receive['eng_name_give']           # (영문)차 이름입니다
+    #eng_name_receive = tea_receive['eng_name_give']          # (영문)차 이름입니다 - 사용 않아서 주석처리
     type_receive = tea_receive['type_give']                   # 대분류1 종류
     eng_type_receive = tea_receive['eng_type_give']           # 대분류1 (영문)종류 - 종류 선택시 자동 입력
     benefit_receive = tea_receive['benefit_give']             # 대분류2 효능
@@ -42,7 +42,7 @@ def save_tea():
 
     doc = {
         'name': name_receive,
-        'eng_name': eng_name_receive,
+        #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
         'eng_type': eng_type_receive,
         'benefit': benefit_receive,
