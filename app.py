@@ -63,7 +63,7 @@ def save_tea():
 def home():
     return render_template('save_tea.html')
 
-# 티 정보 GET 하기 -- 영은
+# 티 정보 GET 하기 -- 영은/ like --승신
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
@@ -73,6 +73,17 @@ def getTea():
 @app.route('/tea')
 def teaList():
     return render_template('get_tea.html')
+
+@app.route('/tea/like', methods=['POST'])
+def likeTea():
+    name_receive = request.form['name_give']
+    target_tea = db.tealist.find_one({'name': name_receive})
+    current_like = target_tea['like']
+
+    new_like = current_like + 1
+
+    db.mystar.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    return jsonify({'msg': 'like +1'})
 # ***************************************************************************************************
 
 
@@ -86,20 +97,22 @@ def teaList():
 def api_register():
     id_receive = request.form['id_give']
     pw_receive = request.form['pw_give']
+    pw_cf_receive = request.form['pw_cf_give']
     nickname_receive = request.form['nickname_give']
-    salt = secrets.token_bytes(32)
-    pw_salt = pw_receive+salt
 
-    pw_hash = hashlib.sha256(pw_salt.encode('utf-8')).hexdigest()
+    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
 
     result = db.user.find_one({'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive})
 
     if result is not None:
         return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
     else:
-        doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive, 'saltValue': salt}
-        db.user.insert_one(doc2)
-        return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
+        if pw_receive == pw_cf_receive:
+            doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive,}
+            db.user.insert_one(doc2)
+            return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
+        else:
+            return jsonify({'result2': '비밀번호가 다른데?'})
 
 
 # [로그인 API]
@@ -123,7 +136,7 @@ def api_login():
         # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.
         payload = {
             'id': id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=900)
         }
 
         SECRET_KEY = "I'M SECRET SEUNGSHIN BRO"
@@ -140,6 +153,10 @@ def api_login():
 @app.route('/sign')
 def signup_page():
     return render_template('01_login.html')
+
+@app.route('/sign1')
+def signup1_page():
+    return render_template('login.html')
 
 
 # ***************************************************************************************************
