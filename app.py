@@ -1,9 +1,7 @@
 
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
-import hashlib
 from hashlib import *
-import jwt
 import datetime
 import chachaconfig
 
@@ -71,7 +69,7 @@ def save_tea():
 def home():
     return render_template('save_tea.html')
 
-# 티 정보 GET 하기 -- 영은/ like --승신
+# 티 정보 GET 하기 -- 영은
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
@@ -81,7 +79,10 @@ def getTea():
 @app.route('/tea')
 def teaList():
     return render_template('get_tea.html')
+# ***************************************************************************************************
 
+# like (seung)
+# ***************************************************************************************************
 @app.route('/tea/like', methods=['POST'])
 def likeTea():
     name_receive = request.form['name_give']
@@ -90,92 +91,56 @@ def likeTea():
 
     new_like = current_like + 1
 
-    db.mystar.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
     return jsonify({'msg': 'like +1'})
 # ***************************************************************************************************
 
+# scrap (seung)
+# ***************************************************************************************************
+@app.route('/tea/scrap', methods=['POST'])
+def scrapTea():
+    name_receive = request.form['name_give']
+    scrap_list = db.tealist.find_one({'name': name_receive})
+    check_scrap = db.scraps.find_one({'name': name_receive})
 
-# 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
-#***************************************************************************************************
-
-# [회원가입 API]
-# id, pw, nickname을 받아서, mongoDB에 저장합니다.
-# 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/sign/signup', methods=['POST'])
-def api_register():
-    id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
-    pw_cf_receive = request.form['pw_cf_give']
-    nickname_receive = request.form['nickname_give']
-
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-
-    doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
-
-    if result is not None:
-        return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
+    if check_scrap is not None:
+        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
-        if pw_receive == pw_cf_receive:
-            doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive,}
-            db.user.insert_one(doc2)
-            return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
-        else:
-            return jsonify({'result2': '비밀번호가 다른데?'})
+        db.scraps.insert_one(scrap_list)
+        return jsonify({'successScrap': '찜 완료 되었습니다.'})
 
-    return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
+@app.route('/tea/scrapList', methods=['GET'])
+def showScrapTea():
+    scrap_list = list(db.scraps.find({}, {'_id': False}).sort("name"))
+    return jsonify({'scrapTeas': scrap_list})
 
-# [로그인 API]
-# id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
-@app.route('/sign/log_in', methods=['POST'])
-def api_login():
-    id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
+@app.route('/api/deleteScrap', methods=['POST'])
+def delete_scrap():
+    name_receive = request.form['name_give']
+    db.scraps.delete_one({'name': name_receive})
+    return jsonify({'msg': '삭제 완료'})
 
-    # 회원가입 때와 같은 방법으로 pw를 암호화합니다.
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
+@app.route('/tea/scrapPage')
+def scrapPage():
+    return render_template('tea_scrap.html')
 
-    # id, 암호화된pw을 가지고 해당 유저를 찾습니다.
-    result = db.user.find_one({'id': id_receive, 'pw': pw_hash})
-
-    # 찾으면 JWT 토큰을 만들어 발급합니다.
-    if result is not None:
-        # JWT 토큰에는, payload와 시크릿키가 필요합니다.방법
-        # 시크릿키가 있어야 토큰을 디코딩(=풀기) 해서 payload 값을 볼 수 있습니다.
-        # 아래에선 id와 exp를 담았습니다. 즉, JWT 토큰을 풀면 유저ID 값을 알 수 있습니다.
-        # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.
-        payload = {
-            'id': id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=900)
-        }
-
-        SECRET_KEY = "I'M SECRET SEUNGSHIN BRO"
-
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
-        # token을 줍니다.
-        return jsonify({'success': '어 그래 로그인 됐다. 와라.', 'token': token})
-    # 찾지 못하면
-    else:
-        return jsonify({'fail': '너 뭐 잘못 했냐?'})
+# ***************************************************************************************************
 
 @app.route('/sign')
-def signup_page():
-   return render_template('01_login.html')
-
-@app.route('/sign1')
 def signup1_page():
     return render_template('login.html')
 
 #***************************************************************************************************
 # mu-jun's function code
 
+
 @app.route('/sign/checkID', methods=['POST'])
+
 def checkID():
-    
+
     id_receive = request.get_json().upper()
-    
     result = db.users.find_one({'id': id_receive})
-    
+
     if result is not None:
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
@@ -193,14 +158,16 @@ def checkNickname():
     else:
         return jsonify({'success': '사용 가능한 별명입니다.'})
 
+# 반복 솔팅?
 def hash_pass(password, id):
+
     personal_key = id[:8].encode('utf-8')
     password = password+chachaconfig.salt_key
-    
+
     for i in range(chachaconfig.iteration_num):
         password = password.encode('utf-8')
         password = blake2s(password,person=personal_key).hexdigest()
-        
+
     return password
 
 @app.route('/sign/signup_test', methods=['POST'])
@@ -322,36 +289,3 @@ def sign_page():
 #***************************************************************************************************
 if __name__ == '__main__':
    app.run('0.0.0.0',port=5000,debug=True)
-
-"""    #GET요청API코드
-@app.route('/test', methods=['GET'])
-def test_get():
-   title_receive = request.args.get('title_give')
-   print(title_receive)
-   return jsonify({'result':'success', 'msg': '이 요청은 GET!'})
-#GET확인코드
-# $.ajax({
-#     type: "GET",
-#     url: "/test?title_give=봄날은간다",
-#     data: {},
-#     success: function(response){
-#        console.log(response)
-#     }
-#   })
-
-#POST요청API코드
-@app.route('/test', methods=['POST'])
-def test_post():
-   title_receive = request.form['title_give']
-   print(title_receive)
-   return jsonify({'result':'success', 'msg': '이 요청은 POST!'})
-   
-#POST확인코드
-# $.ajax({
-#     type: "POST",
-#     url: "/test",
-#     data: { title_give:'봄날은간다' },
-#     success: function(response){
-#        console.log(response)
-#     }
-#   }) """
