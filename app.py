@@ -19,9 +19,18 @@ jwt = JWTManager(app)
 
 # DB 관련
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
-# client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+
+
+# 서버 db 사용시 로컬 db 주석 처리, 로컬 db 사용시 서버 db 주석 처리
+# **********************************************************
+
+# client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+
 db = client.dbchacha
+
+# **********************************************************
+
 
 # 차 정보 입력하기(POST) API
 
@@ -29,20 +38,21 @@ db = client.dbchacha
 def save_tea():
     print(request.is_json)
     tea_receive = request.get_json()
-    print(tea_receive)
-    
-    name_receive = tea_receive['name_give']                              #차 이름입니다
-    type_receive = tea_receive['type_give']                              #대분류1 차의 종류
-    benefit_receive = tea_receive['benefit_give']                        #대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']                  #대분류3 카페인 "함유여부" 없으면 "0" 있으면 "1"
-    caffeine_receive = tea_receive['caffeine_give']                      #상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']            #상세2 상세효능
-    desc_receive = tea_receive['desc_give']                              #상세2 상세설명
-    caution_receive = tea_receive['caution_give']                        #상세3 주의사항
-    img_receive = tea_receive['img_give']                                #상세4 이미지 주소
+    name_receive = tea_receive['name_give']                   # 차 이름입니다
+    #eng_name_receive = tea_receive['eng_name_give']          # (영문)차 이름입니다 - 사용 않아서 주석처리
+    type_receive = tea_receive['type_give']                   # 대분류1 종류
+    eng_type_receive = tea_receive['eng_type_give']           # 대분류1 (영문)종류 - 종류 선택시 자동 입력
+    benefit_receive = tea_receive['benefit_give']             # 대분류2 효능
+    caffeineOX_receive = tea_receive['caffeineOX_give']       # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
+    caffeine_receive = tea_receive['caffeine_give']           # 상세1 카페인 "함량"
+    benefitdetail_receive = tea_receive['benefitdetail_give'] # 상세2 상세효능
+    desc_receive = tea_receive['desc_give']                   # 상세2 상세설명
+    caution_receive = tea_receive['caution_give']             # 상세3 주의사항
+    img_receive = tea_receive['img_give']                     # 상세4 이미지 주소
 
     doc = {
         'name': name_receive,
+        #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
@@ -59,7 +69,31 @@ def save_tea():
 
 @app.route('/')
 def home():
-   return render_template('save_tea.html')
+    return render_template('save_tea.html')
+
+# 티 정보 GET 하기 -- 영은/ like --승신
+# ***************************************************************************************************
+@app.route('/tea/list', methods=['GET'])
+def getTea():
+    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    return jsonify({'all_teas':tea_list})
+
+@app.route('/tea')
+def teaList():
+    return render_template('get_tea.html')
+
+@app.route('/tea/like', methods=['POST'])
+def likeTea():
+    name_receive = request.form['name_give']
+    target_tea = db.tealist.find_one({'name': name_receive})
+    current_like = target_tea['like']
+
+    new_like = current_like + 1
+
+    db.mystar.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    return jsonify({'msg': 'like +1'})
+# ***************************************************************************************************
+
 
 # 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
 #***************************************************************************************************
@@ -71,13 +105,22 @@ def home():
 def api_register():
     id_receive = request.form['id_give']
     pw_receive = request.form['pw_give']
+    pw_cf_receive = request.form['pw_cf_give']
     nickname_receive = request.form['nickname_give']
 
     pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
 
     doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
 
-    db.user.insert_one(doc2)
+    if result is not None:
+        return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
+    else:
+        if pw_receive == pw_cf_receive:
+            doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive,}
+            db.user.insert_one(doc2)
+            return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
+        else:
+            return jsonify({'result2': '비밀번호가 다른데?'})
 
     return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
 
@@ -96,13 +139,13 @@ def api_login():
 
     # 찾으면 JWT 토큰을 만들어 발급합니다.
     if result is not None:
-        # JWT 토큰에는, payload와 시크릿키가 필요합니다.
+        # JWT 토큰에는, payload와 시크릿키가 필요합니다.방법
         # 시크릿키가 있어야 토큰을 디코딩(=풀기) 해서 payload 값을 볼 수 있습니다.
         # 아래에선 id와 exp를 담았습니다. 즉, JWT 토큰을 풀면 유저ID 값을 알 수 있습니다.
         # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.
         payload = {
             'id': id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=5)
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=900)
         }
 
         SECRET_KEY = "I'M SECRET SEUNGSHIN BRO"
@@ -118,6 +161,10 @@ def api_login():
 @app.route('/sign')
 def signup_page():
    return render_template('01_login.html')
+
+@app.route('/sign1')
+def signup1_page():
+    return render_template('login.html')
 
 #***************************************************************************************************
 # mu-jun's function code
