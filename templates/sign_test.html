@@ -268,12 +268,10 @@
             if(isPassiblePassword) {
                 let current_pass = $('#current_pass').val();
                 let new_pass = $('#new_pass').val();
-                let access_token = sessionStorage.getItem('chachaAccessToken');
-                
+
                 $.ajax({
                     type: "POST",
                     url: "/sign/change_pass",
-                    headers: {"Authorization": "Bearer "+ access_token},
                     data: {                        
                         pass_give: current_pass,
                         new_pass_give: new_pass                    
@@ -328,7 +326,7 @@
         <h1>비밀변호 변경 페이지</h1>
         <h5>기존 비밀번호와 새로운 비밀번호를 입력해주세요</h5>
 
-        <p>기본 비밀번호: <input type="password" id="current_pass"/></p>
+        <p>기본 비밀번호: <input type="text" id="current_pass"/></p>
         
         <p>새로운 비밀번호: <input type="password" id="new_pass" oninput="check_change_password();"/></p>
         <p>새로운 비밀번호확인: <input type="password" id="new_pass_check" oninput="check_change_password();"/></p>

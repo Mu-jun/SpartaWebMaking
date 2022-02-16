@@ -9,19 +9,12 @@ import chachaconfig
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
-
-# configure Flask App with Flask RESTFUL API
-# Flask RESTFUL API로 Flask App 구성
-#api = Api(app)
-
 app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
 
-# configure Flask App with JWT support
-# JWT 지원으로 Flask App 구성
 jwt = JWTManager(app)
 
 # DB 관련
@@ -238,7 +231,7 @@ def get_refresh_token():
     
 
 @app.route('/sign/change_pass', methods=['POST'])
-@jwt_required()
+@jwt_required
 def api_change_pass():
     current_user = get_jwt_identity()
     
@@ -262,7 +255,7 @@ def api_change_pass():
         return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
 
 # @app.route('/sign/delete_user', methods=['POST'])
-# @jwt_required()
+# @jwt_required
 # def api_delete_user():
 #     current_user = get_jwt_identity()
     
