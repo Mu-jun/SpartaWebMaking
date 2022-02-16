@@ -236,12 +236,12 @@ def api_signin():
     user = db.users.find_one({'id':id_receive})
     
     print(user)
-    
-    if(hashed_password == user['password']):
-        access_token = create_access_token(identity=user['id'])
-        refresh_token = create_refresh_token(identity=user['id'])
-    
-        return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
+    if(user):
+        if(hashed_password == user['password']):
+            access_token = create_access_token(identity=user['id'])
+            refresh_token = create_refresh_token(identity=user['id'])
+        
+            return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
     else:
         return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
     
@@ -250,19 +250,27 @@ def api_signin():
 @app.route('/set_access_token', methods=['POST'])
 def set_access_token():
     user_id = request.form['id_give']
-    access_token = create_access_token(identity=user_id)
-    response = make_response(render_template('/sign_test.html'))
-    response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
     
+    if(user_id):
+        access_token = create_access_token(identity=user_id)
+        response = make_response(render_template('/sign_test.html'))
+        response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
+    else:
+        response.set_cookie('chachaAccessToken', value=null)
+        
     return response
         
 @app.route('/set_refresh_token', methods=['POST'])
 def set_refresh_token():
     user_id = request.form['id_give']
-    refresh_token = create_refresh_token(identity=user_id)
-    response = make_response(render_template('/sign_test.html'))
-    response.set_cookie('chachaRefreshToken', value=refresh_token)
     
+    if(user_id):
+        refresh_token = create_refresh_token(identity=user_id)
+        response = make_response(render_template('/sign_test.html'))
+        response.set_cookie('chachaRefreshToken', value=refresh_token)
+    else:
+        response.set_cookie('chachaRefreshToken', value=null)
+        
     return response
 
 @app.route('/get_access_token', methods=['GET'])
@@ -296,12 +304,14 @@ def api_change_pass():
     user = db.users.find_one({'id':current_user})
     
     print(user)
-    
-    if(hashed_password == user['password']):
-        db.users.update_one({'id':current_user},{'$set':{'password':new_password}})    
-        return jsonify({'success':'비밀번호가 변경되었습니다.'})
+    if(user):
+        if(hashed_password == user['password']):
+            db.users.update_one({'id':current_user},{'$set':{'password':new_password}})    
+            return jsonify({'success':'비밀번호가 변경되었습니다.'})
+        else:
+            return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
     else:
-        return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
+        return jsonify({'fail':'로그인 먼저 해주세요.'})
 
 # @app.route('/sign/delete_user', methods=['POST'])
 # @jwt_required()
