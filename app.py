@@ -202,7 +202,7 @@ def api_signin():
         return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
     else:
         return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
-
+    
 #cookie
 
 @app.route('/set_access_token', methods=['POST'])
@@ -240,7 +240,7 @@ def get_refresh_token():
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
-    current_user = get_jwt_identity()
+    current_user = get_jwt_identity().upper()
     
     print(type(current_user))
     print(current_user)
