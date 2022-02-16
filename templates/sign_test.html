@@ -127,7 +127,7 @@
             
             $.ajax({
                 type: "POST",
-                url: "/sign/signin_test",
+                url: "/sign/signin",
                 data: { 
                     id_give: id,
                     pass_give: pass,                    
@@ -135,7 +135,7 @@
                 success: function(response){
                     if(response['success']) {
                         alert(response['success']);
-                        insert_token(response['access_token'],response['refresh_token'])
+                        insert_user_token(id)
                         window.location.reload();
                     } 
                     else alert(response['fail'])
@@ -143,49 +143,103 @@
             })
         }
 
-        function insert_token(access_token,refresh_token) {
-            localStorage.setItem('chachaRefreshToken', refresh_token)
-            sessionStorage.setItem('chachaAccessToken', access_token)
+        function insert_user_token(user_id) {
+
+            console.log(user_id);
+
+            $.ajax({
+                type: "POST",
+                url: "/set_access_token",
+                data: {
+                    id_give: user_id
+                }                
+            })
+            $.ajax({
+                type: "POST",
+                url: "/set_refresh_token",
+                data: {
+                    id_give: user_id
+                }                
+            })            
+        }
+
+        function get_access_token() {
+            $.ajax({
+                type: "GET",
+                url: "/get_access_token",                
+                success: function(response){
+                    console.log(response)
+                }
+            }).done(function (result, data) {
+                return data
+            })
+        }
+
+        function get_refresh_token() {
+            $.ajax({
+                type: "GET",
+                url: "/get_refresh_token",
+                success: function(response){
+                    console.log(response)
+                }
+            }).done(function (result, data) {
+                return data
+            })
+        }
+
+        function get_payload(token) {
+
+            console.log(token)
+
+            let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
+            let payload = atob(base64Payload);
+            
+            console.log(payload);
+
+            return payload;
         }
 
         function get_payload_exp(token) {
 
-            let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-            let payload = atob(base64Payload).split(',')[6].split(':')[1].split('}')[0];
+            let exp = get_payload(token).split(',')[6].split(':')[1].split('}')[0];
 
-            return +payload;
+            return +exp;
         }
 
-        function check_token() {
+        function refreshing_token(refresh_token) {
+            $.ajax({
+                type: "GET",
+                url: "/refresh",
+                headers: {"Authorization": "Bearer "+ refresh_token},
+                success: function(response){
+                    insert_user_token(response)
+                }
+            })
+        }
+        async function check_token() {
 
             let date = new Date();
             let numberic_date = parseInt(date/1000)
-
             console.log(numberic_date);
 
-            let access_token = sessionStorage.getItem('chachaAccessToken');
-            let access_payload_exp = get_payload_exp(access_token);
-            
+            let access_token = await get_access_token();
+            console.log(access_token);
+
+            let access_payload_exp = get_payload_exp(access_token);           
             console.log(access_payload_exp);
 
             if(access_payload_exp > numberic_date) {
                 $('#singupPage').hide();
                 $('#singinPage').hide();
             } else {
-                let refresh_token = localStorage.getItem('chachaRefreshToken');                
+                let refresh_token = await get_access_token();
+                console.log(refresh_token);
+                               
                 let refresh_payload_exp = get_payload_exp(refresh_token);
-                
                 console.log(refresh_payload_exp);
 
                 if(refresh_payload_exp > numberic_date) {
-                    $.ajax({
-                        type: "GET",
-                        url: "/refresh",
-                        headers: {"Authorization": "Bearer "+ refresh_token},
-                        success: function(response){
-                            insert_token(response['access_token'],response['refresh_token'])
-                        }
-                    })
+                    refreshing_token();
                 } else {
                     $('#singupPage').show();
                     $('#singinPage').show();

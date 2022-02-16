@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
 import hashlib
 from hashlib import *
@@ -18,6 +18,7 @@ app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
 
 # configure Flask App with JWT support
 # JWT 지원으로 Flask App 구성
@@ -182,7 +183,7 @@ def signup():
     
     return jsonify({'success': '가입완료!'})
 
-@app.route('/sign/signin_test', methods=['POST'])
+@app.route('/sign/signin', methods=['POST'])
 def api_signin():
     
     id_receive = request.form['id_give'].upper()
@@ -201,6 +202,40 @@ def api_signin():
         return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
     else:
         return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
+
+#cookie
+
+@app.route('/set_access_token', methods=['POST'])
+def set_access_token():
+    user_id = request.form['id_give']
+    access_token = create_access_token(identity=user_id)
+    response = make_response(render_template('/sign_test.html'))
+    response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
+    
+    return response
+        
+@app.route('/set_refresh_token', methods=['POST'])
+def set_refresh_token():
+    user_id = request.form['id_give']
+    refresh_token = create_refresh_token(identity=user_id)
+    response = make_response(render_template('/sign_test.html'))
+    response.set_cookie('chachaRefreshToken', value=refresh_token)
+    
+    return response
+
+@app.route('/get_access_token', methods=['GET'])
+def get_access_token():
+    result = request.cookies.get('chachaAccessToken')
+    
+    return result
+        
+@app.route('/get_refresh_token', methods=['GET'])
+def get_refresh_token():
+    result = request.cookies.get('chachaRefreshToken')
+    
+    return result
+    
+    
 
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
