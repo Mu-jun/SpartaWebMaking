@@ -270,7 +270,7 @@ def set_access_token():
         if(user_id):
             access_token = create_access_token(identity=user_id)
             
-            response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
+            response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True) #path='/localhost', domain='/localhost', httponly=True
         else:
             response.delete_cookie('chachaAccessToken')
     else:
@@ -289,7 +289,7 @@ def set_refresh_token():
         
         if(user_id):
             refresh_token = create_refresh_token(identity=user_id)            
-            response.set_cookie('chachaRefreshToken', value=refresh_token)
+            response.set_cookie('chachaRefreshToken', value=refresh_token, samesite = None, httponly=True)#path='/localhost', domain='/localhost', 
         else:
             response.delete_cookie('chachaRefreshToken')
     else:
