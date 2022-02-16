@@ -121,7 +121,7 @@ def showScrapTea():
     scrap_list = list(db.scraps.find({}, {'_id': False}).sort("name"))
     return jsonify({'scrapTeas': scrap_list})
 
-@app.route('/api/deleteScrap', methods=['POST'])
+@app.route('/tea/deleteScrap', methods=['POST'])
 def delete_scrap():
     name_receive = request.form['name_give']
     db.scraps.delete_one({'name': name_receive})

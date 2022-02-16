@@ -42,7 +42,7 @@
         function deleteScrap(name) {
             $.ajax({
                 type: 'POST',
-                url: '/api/deleteScrap',
+                url: '/tea/deleteScrap',
                 data: {name_give: name},
                 success: function (response) {
                     alert(response['msg']);
