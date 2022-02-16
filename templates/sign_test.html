@@ -14,7 +14,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/styles.css" />
         
-    <script>
+    <script src='../static/script/sign.js'></script>
+    <script>        
 
         $(document).ready(function () {
             check_token();            
@@ -27,9 +28,16 @@
             $('#checkIDText').text('중복확인해주세요');
         }
 
-        function checkID() {
+        async function checkID() {
             let id = $('#signup_id').val();
 
+            let result = await sign_checkID(id);
+
+            isPassibleID = result.isPassible;
+            alert(result.msg);
+            if(isPassibleID) $('#checkIDText').text('중복확인완료');
+            
+/*
             $.ajax({
                 type: "POST",
                 url: "/sign/checkID",
@@ -47,7 +55,7 @@
                         alert(response["fail"]);                        
                     }                    
                 }
-            })
+            })*/
         }
 
         let isPassibleNickname = false;
@@ -185,12 +193,18 @@
 
         async function get_access_token() {
             let result = await fetch('get_access_token');
-            let token = await result.text()
+            console.log(result)
+
+            let token = '';
+            if(result.ok) token = await result.text()
+
             return token;
         }
 
         async function get_refresh_token() {
             let result = await fetch('get_refresh_token');
+            console.log(result)
+
             let token = await result.text()
             return token;
         }
@@ -199,11 +213,13 @@
 
             console.log(token)
 
-            let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
-            let payload = atob(base64Payload);
-            
-            console.log(payload);
-
+            let payload = '';
+            if(token){
+                let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
+                payload = atob(base64Payload);
+                
+                console.log(payload);
+            }
             return payload;
         }
 
@@ -247,7 +263,6 @@
 
             let access_token = await get_access_token();
             
-
             let access_payload_exp = get_payload_exp(access_token);            
 
             if(access_payload_exp > numberic_date) {
