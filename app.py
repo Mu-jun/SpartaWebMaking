@@ -229,6 +229,8 @@ def api_signin():
     id_receive = request.form['id_give'].upper()
     pass_receive = request.form['pass_give']
     
+    print(id_receive)
+    
     hashed_password = hash_pass(pass_receive,id_receive)
     
     user = db.users.find_one({'id':id_receive})
@@ -278,7 +280,7 @@ def get_refresh_token():
     
 
 @app.route('/sign/change_pass', methods=['POST'])
-@jwt_required
+@jwt_required()
 def api_change_pass():
     current_user = get_jwt_identity().upper()
     
@@ -302,7 +304,7 @@ def api_change_pass():
         return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
 
 # @app.route('/sign/delete_user', methods=['POST'])
-# @jwt_required
+# @jwt_required()
 # def api_delete_user():
 #     current_user = get_jwt_identity()
     

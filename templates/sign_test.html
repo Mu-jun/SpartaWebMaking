@@ -279,6 +279,7 @@
                 $.ajax({
                     type: "POST",
                     url: "/sign/change_pass",
+                    headers: {"Authorization": "Bearer "+ access_token},
                     data: {                        
                         pass_give: current_pass,
                         new_pass_give: new_pass                    
