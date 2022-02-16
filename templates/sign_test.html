@@ -125,7 +125,8 @@
 
         function signinout() {
             if(isLogin){
-
+                signout_mode();
+                insert_user_token();
             }else{
                 let id = $('#signin_id').val();
                 let pass = $('#signin_pass').val();
@@ -140,8 +141,7 @@
                     success: function(response){
                         if(response['success']) {
                             alert(response['success']);
-                            insert_user_token(id);
-                            isLogin = true;
+                            insert_user_token(id);                                                       
                             window.location.reload();
                         } 
                         else alert(response['fail'])
@@ -154,20 +154,33 @@
 
             console.log(user_id);
 
-            $.ajax({
-                type: "POST",
-                url: "/set_access_token",
-                data: {
-                    id_give: user_id
-                }                
-            })
-            $.ajax({
-                type: "POST",
-                url: "/set_refresh_token",
-                data: {
-                    id_give: user_id
-                }                
-            })            
+            let access_token_url = "/set_access_token";
+            let refresh_token_url = "/set_refresh_token";
+            
+            if(user_id) {
+                console.log('로그인')
+
+                $.ajax({
+                    type: "POST",
+                    url: access_token_url,
+                    data: {
+                        id_give: user_id
+                    }                
+                })
+                $.ajax({
+                    type: "POST",
+                    url: refresh_token_url,
+                    data: {
+                        id_give: user_id
+                    }                
+                })
+            }else {
+                console.log('로그아웃')
+
+                fetch(access_token_url);
+                fetch(refresh_token_url);
+            }
+
         }
 
         async function get_access_token() {
@@ -213,12 +226,14 @@
         }
 
         function signin_mode() {
+            isLogin = true;
             $('#signupPage').hide();
             $('#signinPage').hide();
             $('#signinoutBtn').text('로그아웃');
         }
 
         function signout_mode() {
+            isLogin = false;
             $('#signupPage').show();
             $('#signinPage').show();
             $('#signinoutBtn').text('로그인');

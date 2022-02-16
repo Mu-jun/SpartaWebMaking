@@ -171,6 +171,7 @@ def signup1_page():
 
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
+    print('checkID start')
     
     id_receive = request.get_json().upper()
     
@@ -183,6 +184,7 @@ def checkID():
     
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
+    print('checkNickname start')
     
     nickname_receive = request.get_json().upper()
     
@@ -205,6 +207,7 @@ def hash_pass(password, id):
 
 @app.route('/sign/signup_test', methods=['POST'])
 def signup():
+    print('signup start')
     
     id_receive = request.form['id_give'].upper()
     pass_receive = request.form['pass_give']
@@ -225,6 +228,7 @@ def signup():
 
 @app.route('/sign/signin', methods=['POST'])
 def api_signin():
+    print('signin start')
     
     id_receive = request.form['id_give'].upper()
     pass_receive = request.form['pass_give']
@@ -247,40 +251,57 @@ def api_signin():
     
 #cookie
 
-@app.route('/set_access_token', methods=['POST'])
+@app.route('/set_access_token', methods=['GET', 'POST'])
 def set_access_token():
-    user_id = request.form['id_give']
+    print('set_access_token start')
     
-    if(user_id):
-        access_token = create_access_token(identity=user_id)
-        response = make_response(render_template('/sign_test.html'))
-        response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
+    response = make_response(render_template('/sign_test.html'))
+    
+    if request.method == "POST":
+        user_id = request.form['id_give']
+    
+        if(user_id):
+            access_token = create_access_token(identity=user_id)
+            
+            response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
+        else:
+            response.delete_cookie('chachaAccessToken')
     else:
-        response.set_cookie('chachaAccessToken', value=null)
-        
+        response.delete_cookie('chachaAccessToken')
+             
     return response
         
-@app.route('/set_refresh_token', methods=['POST'])
+@app.route('/set_refresh_token', methods=['GET', 'POST'])
 def set_refresh_token():
-    user_id = request.form['id_give']
+    print('set_refresh_token start')
     
-    if(user_id):
-        refresh_token = create_refresh_token(identity=user_id)
-        response = make_response(render_template('/sign_test.html'))
-        response.set_cookie('chachaRefreshToken', value=refresh_token)
+    response = make_response(render_template('/sign_test.html'))
+    
+    if request.method == 'POST':
+        user_id = request.form['id_give']
+        
+        if(user_id):
+            refresh_token = create_refresh_token(identity=user_id)            
+            response.set_cookie('chachaRefreshToken', value=refresh_token)
+        else:
+            response.delete_cookie('chachaRefreshToken')
     else:
-        response.set_cookie('chachaRefreshToken', value=null)
+        response.delete_cookie('chachaRefreshToken')
         
     return response
 
 @app.route('/get_access_token', methods=['GET'])
 def get_access_token():
+    print('get_access_token start')
+    
     result = request.cookies.get('chachaAccessToken')
     
     return result
         
 @app.route('/get_refresh_token', methods=['GET'])
 def get_refresh_token():
+    print('get_refresh_token start')
+    
     result = request.cookies.get('chachaRefreshToken')
     
     return result
@@ -290,6 +311,7 @@ def get_refresh_token():
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
+    print('change_pass start')
     current_user = get_jwt_identity().upper()
     
     print(type(current_user))
@@ -313,16 +335,20 @@ def api_change_pass():
     else:
         return jsonify({'fail':'로그인 먼저 해주세요.'})
 
-# @app.route('/sign/delete_user', methods=['POST'])
-# @jwt_required()
-# def api_delete_user():
-#     current_user = get_jwt_identity()
+@app.route('/sign/delete_user', methods=['POST'])
+@jwt_required()
+def api_delete_user():
+    print('delete_user start')
     
-#     return jsonify({'success':'회원탈퇴완료'})
+    current_user = get_jwt_identity()
+    
+    return jsonify({'success':'회원탈퇴완료'})
 
 @app.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)
 def refresh():
+    print('refresh start')
+    
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
     return jsonify(access_token=access_token, current_user=current_user)
