@@ -26,8 +26,8 @@ jwt = JWTManager(app)
 
 # DB 관련
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
-# client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+#client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 db = client.dbchacha
 
 # 차 정보 입력하기(POST) API
