@@ -103,7 +103,7 @@ def read_mongo():
         is_type = df['type'] == type_receive[i]
 
      for i in range(len(benefit_receive)):
-        has_benefit = df['benefit'].str.contains(benefit_receive[i])
+        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
 
      for i in caffeineOX_receive:
         has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
