@@ -1,6 +1,7 @@
 
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
+from flask_bcrypt import *
 import hashlib
 from hashlib import *
 import jwt
@@ -176,6 +177,7 @@ def signup1_page():
 #***************************************************************************************************
 # mu-jun's function code
 
+#  signup
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
     print('checkID start')
@@ -216,9 +218,12 @@ def hash_pass(password, id):
 def signup():
     print('signup start')
     
-    id_receive = request.form['id_give'].upper()
-    pass_receive = request.form['pass_give']
-    nickname_receive = request.form['nickname_give'].upper()
+    receive = request.get_json();
+    print(receive)
+    
+    id_receive = receive['id_give'].upper()
+    pass_receive = receive['pass_give']
+    nickname_receive = receive['nickname_give'].upper()
     
     hashed_password = hash_pass(pass_receive,id_receive)
            
@@ -233,6 +238,7 @@ def signup():
     
     return jsonify({'success': '가입완료!'})
 
+#sign in
 @app.route('/sign/signin', methods=['POST'])
 def api_signin():
     print('signin start')
@@ -244,9 +250,9 @@ def api_signin():
     
     hashed_password = hash_pass(pass_receive,id_receive)
     
-    user = db.users.find_one({'id':id_receive})
-    
+    user = db.users.find_one({'id':id_receive})    
     print(user)
+    
     if(user):
         if(hashed_password == user['password']):
             access_token = create_access_token(identity=user['id'])
@@ -256,24 +262,27 @@ def api_signin():
     else:
         return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
     
-#cookie
+#cookie 토큰관리
 
 @app.route('/set_access_token', methods=['GET', 'POST'])
 def set_access_token():
-    print('set_access_token start')
-    
+    print('set_access_token start')    
     response = make_response(render_template('/sign_test.html'))
     
     if request.method == "POST":
+        
         user_id = request.form['id_give']
     
         if(user_id):
+            print('액세스토큰쿠키 생성')
             access_token = create_access_token(identity=user_id)
             
             response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True) #path='/localhost', domain='/localhost', httponly=True
         else:
+            print('액세스토큰쿠키 삭제2')
             response.delete_cookie('chachaAccessToken')
     else:
+        print('액세스토큰쿠키 삭제1')
         response.delete_cookie('chachaAccessToken')
              
     return response
@@ -284,44 +293,58 @@ def set_refresh_token():
     
     response = make_response(render_template('/sign_test.html'))
     
-    if request.method == 'POST':
+    if request.method == "POST":
         user_id = request.form['id_give']
         
         if(user_id):
+            print('리프레쉬토큰쿠키 생성')
             refresh_token = create_refresh_token(identity=user_id)            
             response.set_cookie('chachaRefreshToken', value=refresh_token, samesite = None, httponly=True)#path='/localhost', domain='/localhost', 
         else:
+            print('리프레쉬토큰쿠키 삭제2')
             response.delete_cookie('chachaRefreshToken')
     else:
+        print('리프레쉬토큰쿠키 삭제1')
         response.delete_cookie('chachaRefreshToken')
         
     return response
 
 @app.route('/get_access_token', methods=['GET'])
-def get_access_token():
+def api_get_access_token():
     print('get_access_token start')
     
     result = request.cookies.get('chachaAccessToken')
+    print(result)
     
-    return result
-        
+    if result is not None:
+        return jsonify(result)
+    else:
+        return jsonify(None)
+            
 @app.route('/get_refresh_token', methods=['GET'])
-def get_refresh_token():
+def api_get_refresh_token():
     print('get_refresh_token start')
     
     result = request.cookies.get('chachaRefreshToken')
     
     return result
     
+@app.route('/refresh', methods=['GET'])
+@jwt_required(refresh=True)
+def refresh():
+    print('refresh start')
     
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=current_user)
+    return jsonify(access_token=access_token, current_user=current_user)
 
+#sign information 유저정보변경
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
     print('change_pass start')
     current_user = get_jwt_identity().upper()
-    
-    print(type(current_user))
+        
     print(current_user)
     
     pass_receive = request.form['pass_give']
@@ -347,19 +370,26 @@ def api_change_pass():
 def api_delete_user():
     print('delete_user start')
     
-    current_user = get_jwt_identity()
+    current_user = get_jwt_identity().upper()
+    receive = request.get_json()
+    password = receive['pass_give']    
     
-    return jsonify({'success':'회원탈퇴완료'})
-
-@app.route('/refresh', methods=['GET'])
-@jwt_required(refresh=True)
-def refresh():
-    print('refresh start')
+    hashed_password = hash_pass(password,current_user)
     
-    current_user = get_jwt_identity()
-    access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
-
+    user = db.users.find_one({'id':current_user})
+        
+    if(user):        
+        if(hashed_password == user['password']):            
+            db.users.delete_one({'id':current_user})            
+            print('success')
+            return jsonify({'success':'탈퇴하셨습니다.'})            
+        else:
+            print('fail2')
+            return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
+    else:
+        print('fail1')
+        return jsonify({'fail':'로그인 먼저 해주세요.'})
+    
 @app.route('/sign_test')
 def sign_page():
    return render_template('sign_test.html')

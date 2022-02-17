@@ -21,6 +21,7 @@
             check_token();            
         });
 
+    //  Check ID
         let isPassibleID = false;
 
         function changeID() {
@@ -35,29 +36,10 @@
 
             isPassibleID = result.isPassible;
             alert(result.msg);
+
             if(isPassibleID) $('#checkIDText').text('중복확인완료');
-            
-/*
-            $.ajax({
-                type: "POST",
-                url: "/sign/checkID",
-                //dataType: "json",
-                headers: {'Content-Type': 'application/json'},
-                data: JSON.stringify(id),
-                success: function (response) {
-
-                    if(response["success"]) {
-                        alert(response["success"]);
-                        isPassibleID = true;
-                        $('#checkIDText').text('중복확인완료');
-                    }
-                    else if(response["fail"]){
-                        alert(response["fail"]);                        
-                    }                    
-                }
-            })*/
         }
-
+    //  Check nickname
         let isPassibleNickname = false;
 
         function changeNickname() {
@@ -65,76 +47,44 @@
             $('#checkNicknameText').text('중복확인해주세요');
         }
 
-        function checkNickname() {
+        async function checkNickname() {
             
             let nickname = $('#signup_nick').val();
 
-            $.ajax({
-                type: "POST",
-                url: "/sign/checkNickname",
-                headers: {'Content-Type': 'application/json'},
-                data: JSON.stringify(nickname),
-                success: function (response) {
+            let result = await sign_checkNickname(nickname);
 
-                    if(response["success"]) {
-                        alert(response["success"]);    
-                        isPassibleNickname = true; 
-                        $('#checkNicknameText').text('중복확인완료');
-                    }
-                    else if(response["fail"]){
-                        alert(response["fail"]);                        
-                    }                    
-                }
-            })
-            
+            isPassibleNickname = result.isPassible;
+            alert(result.msg);
+
+            if(isPassibleNickname) $('#checkNicknameText').text('중복확인완료');            
         }
-
-        function test_signup() {
+    //  signup
+        async function test_signup() {
 
             if(isPassibleID&&isPassibleNickname) {
 
                 let id = $('#signup_id').val();
                 let pass = $('#signup_pass').val();
                 let nickname = $('#signup_nick').val();
-                //let encrypt_pass = hash_pass(pass);
 
-                $.ajax({
-                    type: "POST",
-                    url: "/sign/signup_test",
-                    data: { 
-                        id_give: id,
-                        pass_give: pass,
-                        nickname_give: nickname
-                    },
-                    success: function(response){
-                        if(response['success']) {
-                            alert(response['success']);
-                            window.location.reload();
-                        } 
-                        else alert('가입실패')                        
-                    }
-                })
+                let response = await sign_signup(id,pass,nickname)
+
+                if(response) {
+                    alert(response['success']);
+                    window.location.reload();
+                } else alert('가입실패');
 
             } else {
                 alert('ID와 별명 중복확인 바랍니다.');
             }
 
         }
-
-        function hash_pass(pass) {
-
-            let result = CryptoJS.SHA512(pass+"kd7baw5v6ru");
-            console.log(result);
-
-            return result;
-        }
-
+    //  signin&out
         let isLogin = false;
 
         function signinout() {
             if(isLogin){
-                signout_mode();
-                insert_user_token();
+                signout_mode();                
             }else{
                 let id = $('#signin_id').val();
                 let pass = $('#signin_pass').val();
@@ -184,7 +134,6 @@
                 })
             }else {
                 console.log('로그아웃')
-
                 fetch(access_token_url);
                 fetch(refresh_token_url);
             }
@@ -196,8 +145,9 @@
             console.log(result)
 
             let token = '';
-            if(result.ok) token = await result.text()
+            if(result.ok) token = await result.json();
 
+            console.log('access_token:'+typeof token+token)
             return token;
         }
 
@@ -253,36 +203,37 @@
             $('#signupPage').show();
             $('#signinPage').show();
             $('#signinoutBtn').text('로그인');
+            insert_user_token();
         }
 
         async function check_token() {
 
             let date = new Date();
-            let numberic_date = parseInt(date/1000)
-            console.log(numberic_date);
-
-            let access_token = await get_access_token();
+            let numberic_date = parseInt(date/1000)           
             
-            let access_payload_exp = get_payload_exp(access_token);            
+            let access_token = await get_access_token();            
 
-            if(access_payload_exp > numberic_date) {
-                signin_mode();
-            } else {
-                let refresh_token = await get_access_token();
-                console.log(refresh_token);
-                               
-                let refresh_payload_exp = get_payload_exp(refresh_token);
-                console.log(refresh_payload_exp);
+            if(access_token) {
+                let access_payload_exp = get_payload_exp(access_token);            
 
-                if(refresh_payload_exp > numberic_date) {
-                    refreshing_token();
+                if(access_payload_exp > numberic_date) {
+                    signin_mode();
                 } else {
-                    signout_mode();
-                }
+                    let refresh_token = await get_access_token();
+                    console.log(refresh_token);
+                                
+                    let refresh_payload_exp = get_payload_exp(refresh_token);
+                    console.log(refresh_payload_exp);
 
+                    if(refresh_payload_exp > numberic_date) {
+                        refreshing_token();
+                    } else {
+                        signout_mode();
+                    }
+                }
             }
         }
-
+//  비밀번호변경
         let isPassiblePassword = false;
 
         function check_change_password() {
@@ -329,9 +280,29 @@
             }
 
         }
+//  회원탈퇴
+        async function test_delete_user() {
+            let password = $('#user_pass').val();
+            console.log(password)
 
-        function test_delete_user() {
+            await check_token();
+            let access_token = await get_access_token();
 
+            let response = await fetch('/sign/delete_user',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8',
+                    "Authorization": "Bearer "+ access_token
+                },
+                body: JSON.stringify({'pass_give': password})
+            }).then(result=>result.json());
+
+            console.log(response)
+            if(response['success']) {
+                alert(response['success']);
+                signout_mode();
+            }
+            else if (response['fail']) alert(response['fail']);            
         }
 
     </script>
@@ -374,8 +345,6 @@
         <h1>회원탈퇴 페이지</h1>
         <h5>패스워드를 입력해주세요</h5>
 
-        <p>ID: <input type="text" id="user_id"/></p>
-        
         <p>PW: <input type="password" id="user_pass"/></p>
         
         <button type="button" onclick="test_delete_user();">탈퇴하기</button>
