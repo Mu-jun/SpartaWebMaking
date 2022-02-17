@@ -138,7 +138,7 @@ def teaList():
     return render_template('get_tea.html')
 # ***************************************************************************************************
 
-# like (seung)
+# like --승신
 # ***************************************************************************************************
 @app.route('/tea/like', methods=['POST'])
 @jwt_required()
@@ -157,7 +157,7 @@ def likeTea():
 
 # ***************************************************************************************************
 
-# scrap (seung)
+# scrap --승신
 # ***************************************************************************************************
 @app.route('/tea/scrap', methods=['POST'])
 @jwt_required()
@@ -165,9 +165,11 @@ def scrapTea():
     current_user = get_jwt_identity().upper()
     name_receive = request.form['name_give']
     scrap_list = db.tealist.find_one({'name': name_receive},{'_id':False})
-    check_scrap = db.scraps.find_one({'user_id': current_user})
+    check_scrap_name = db.scraps.find_one({'name': name_receive})
+    check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
-    if check_scrap is not None:
+
+    if check_scrap_name and check_scrap_id is not None:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         db.scraps.insert_one(scrap_list)
@@ -200,10 +202,6 @@ def scrapPage():
     return render_template('tea_scrap.html')
 
 # ***************************************************************************************************
-
-@app.route('/sign')
-def signup1_page():
-    return render_template('login.html')
 
 #***************************************************************************************************
 # mu-jun's function code
