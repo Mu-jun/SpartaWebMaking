@@ -58,7 +58,7 @@ def save_tea():
         'name': name_receive,
         #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
-        'eng_type' : eng_type_receive
+        'eng_type' : eng_type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
