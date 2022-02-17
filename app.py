@@ -11,7 +11,6 @@ import pandas as pd
 import json
 
 
-
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
 
@@ -97,30 +96,45 @@ def saveTea():
 # ***************************************************************************************************
 
 # 차 추천기능 (카테고리 선택에 의함) _ 재영
+# 대체 어제는 왜 for문을 돌렸는데 됐을까? 명백히 논리적으로 오류인데 어째서 결과가 나왔던 걸까?
+# 어쨌든 더 찾아보고 더 파서 해냈다 ㄱㄱㅌㄱ
 
 @app.route('/recommend/find',methods=['POST'])
 def read_mongo():
-     df = pd.DataFrame(list(db.tealist.find({}, {'_id': False}).sort('name')))
+     # df_all : Pandas(패키지)로 데이터프레임 형태를 만들어, DB 전체를 불러온다.
+     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
      selector_receive = request.get_json()
      type_receive = selector_receive['type_give']
      benefit_receive = selector_receive['benefit_give']
      caffeineOX_receive = selector_receive['caffeineOX_give']
 
-     # type 컬럼을 선택합니다. 컬럼의 값과 조건을 비교합니다.그 결과를 새로운 변수에 할당합니다.
-     for i in range(len(type_receive)):
-        is_type = df['type'] == type_receive[i]
+     # df_type : 전체 데이터프레임(df_all)에서 type이 '같은' 항목들만 받아서 새로 데이터프레임을 만든다.
+     df_type = df_all.loc[df_all['type'].isin(type_receive)]
+     df_type.head()
 
+     # benequery : 데이터프레임에서 어떤 조건으로 검색할지 query문을 만들어주기 위한 문자 함수이다.
+     # 입력받는 효능의 갯수가 불확실한 상황에서, DB상의 "효능"란에 입력받은 값이 '포함' 되는지를 비교할 기능을 찾지 못했다.
+     # 우리가 입력받은 효능 값의 개수만큼 for 문을 돌려서 아래와 같이 query 문을 만들었다.
+     # 예시: (@df_type['benefit'].str.contains ('다이어트')) or (@df_type['benefit'].str.contains('피부미용'))
+
+     benequery = f"(@df_type['benefit'].str.contains ('"
      for i in range(len(benefit_receive)):
-        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
+        if i < len(benefit_receive)-1:
+            benequery += benefit_receive[i] + f"')) or (@df_type['benefit'].str.contains('"
+        else:
+            benequery += benefit_receive[i] + f"'))"
+     print (benequery)
 
-     for i in caffeineOX_receive:
-        has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
+     #df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
+     df_benefit = df_type.query(benequery)
+     df_benefit.head()
 
-     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다.(AND)
-     subset_df = df[is_type & has_benefit & has_caffeine]
+     # df_caffeine : benefit 으로 걸러낸 데이터프레임(df_benefit) 중에서, caffeineOX가 '같은' 항목들만 받아서 새로운 데이터프레임을 만든다.
+     df_caffeine = df_benefit.loc[df_benefit['caffeineOX'].isin(caffeineOX_receive)]
+     df_caffeine.head()
 
-     # JSON 형식으로 바꿔줍니다 (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
-     find_list = subset_df.to_json(orient = 'records',force_ascii=False)
+     # 다 걸러진 결과값을 JSON 형식으로 바꿔준다. (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
+     find_list = df_caffeine.to_json(orient = 'records',force_ascii=False)
 
      return jsonify({'find_teas': find_list})
 
