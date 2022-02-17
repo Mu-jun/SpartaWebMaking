@@ -17,7 +17,12 @@ db = client.dbchacha
 # #여러개를 바꿀 때는 update_many가 있지만 위험해서 잘 쓰지 않는다.
 
 # db.tealist.update_one({'name':'커피'},{'$set':{'benefit':'피로회복 힐링힐링'}})
-# db.tealist.update_one({'name':'곽산황아'},{'$set':{'like':0}})
+# db.tealist.update_one({'name':'결명자차'},{'$set':{'like':0}})
+
+scrap_list = list(db.scraps.find({'user_id':"123"}, {'_id': False}).sort("name"))
+
+print(scrap_list)
+
 
 
 

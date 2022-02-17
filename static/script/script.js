@@ -223,11 +223,14 @@
             }
         }
 
-        function likeTea(name) {
+        async function likeTea(name) {
+            let access_token = await get_access_token();
+
             $.ajax({
                 type: 'POST',
                 url: '/tea/like',
                 data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
                 success: function (response) {
                     alert(response['msg']);
                     window.location.reload()
@@ -235,11 +238,20 @@
             });
         }
 
-        function scrapTea(name) {
+        async function get_access_token() {
+            let result = await fetch('/get_access_token');
+            let token = await result.text()
+            return token;
+        }
+
+        async function scrapTea(name) {
+            let access_token = await get_access_token();
+
             $.ajax({
                 type: 'POST',
                 url: '/tea/scrap',
                 data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
                 success: function (response) {
 
                     if(response['alreadyScrap']) {
