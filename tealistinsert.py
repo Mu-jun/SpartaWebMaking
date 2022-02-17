@@ -693,7 +693,7 @@ db.tealist.insert_many([
   "user_id": None
  },
  {
-  "eng_name": "Lady Grey",
+  "eng_name": "Earl Grey",
   "name": "얼그레이",
   "type": "홍차",
   "eng_type": "Black Tea",
