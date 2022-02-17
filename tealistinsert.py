@@ -7,9 +7,9 @@ db = client.dbchacha
 # 데이터가 들어있는 엑셀 파일을 만들고, CSV(쉼표로 구분, UTF-8) 파일로 내보내기 하여 저장한다.
 # 위 사이트에서 CSV 파일을 JSON 파일로 변환한다.
 # 값을 아래에 붙여넣은 후, '찾아 바꾸기'(모두)를 이용하여 깨지는 부분들을 수정해 준다.
-  # true를 True 로 바꾼다.
-  # false를 False 로 바꾼다.
-  # None을 None 으로 바꾼다.
+  # true 를 True 로 바꾼다.
+  # fals e를 False 로 바꾼다.
+  # null 을 None 으로 바꾼다.
   # \/ 를 / 로 바꾼다.
   # "caffeine": 0, 을 "caffeine": "0", 으로 바꾼다. 카페인 함량이 있는 경우 10mg/200ml 과 같이 텍스트로 표현되기에 자료형 맞춰줌.
     # "caffeine": 부분을 빼고 0 을 "0" 으로 바꿔서는 안됨! 좋아요 갯수는 integer로 남아야 하기 때문
