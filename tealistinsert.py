@@ -1,6 +1,6 @@
 from pymongo import MongoClient
-client = MongoClient('localhost', 27017)
-#client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+#client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 db = client.dbchacha
 
 # https://products.aspose.app/cells/ko/conversion/csv-to-json
@@ -547,7 +547,7 @@ db.tealist.insert_many([
   "name": "꽃잎홍차",
   "type": "홍차",
   "eng_type": "Black Tea",
-  "benefit": "다이어트 질병예방 정신건강",
+  "benefit": "다이어트 질병예방 정신건강 피로회복",
   "benefitdetail": "지방분해,감기예방,심장건강,항암효과,스트레스완화,치아건강,구취개선",
   "desc": "다양한 꽃잎향과 과일향을 첨가한 홍차로 뒷맛이 향긋한 것이 특징이다. 장미의 잎과 향을 첨가한 로즈 티가 대표적이다. ",
   "caffeineOX": True,
@@ -693,7 +693,7 @@ db.tealist.insert_many([
   "user_id": None
  },
  {
-  "eng_name": "Earl Grey",
+  "eng_name": "Lady Grey",
   "name": "얼그레이",
   "type": "홍차",
   "eng_type": "Black Tea",
@@ -712,7 +712,7 @@ db.tealist.insert_many([
   "name": "우바",
   "type": "홍차",
   "eng_type": "Black Tea",
-  "benefit": "질병예방 소화기능 정신건강",
+  "benefit": "질병예방 소화기능 정신건강 피로회복",
   "benefitdetail": "항산화 효과,감기예방,심장건강,항암효과,스트레스 완화,치아건강,구취개선",
   "desc": "스리랑카 실론이 원산지로, 세계 3대 홍차 중의 하나이다. 맛이 진하며 달콤한 장미향을 느낄 수 있고, 투명하고 밝은 홍색의 수색을 갖는다. 골든팁이 많이 들어가 있어 골든링이 선명하게 보이는 홍차이다. 레몬을 넣어 마시거나 아이스티, 밀크티로 즐기기에도 좋다.",
   "caffeineOX": True,
@@ -872,5 +872,4 @@ db.tealist.insert_many([
   "like": 0,
   "user_id": None
  }
-]
-)
+])
