@@ -88,9 +88,10 @@ def teaList():
     return render_template('get_tea.html')
 # ***************************************************************************************************
 
-# like (seung)
+# like --승신
 # ***************************************************************************************************
 @app.route('/tea/like', methods=['POST'])
+@jwt_required()
 def likeTea():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
@@ -102,40 +103,50 @@ def likeTea():
     return jsonify({'msg': 'like +1'})
 # ***************************************************************************************************
 
-# scrap (seung)
+# scrap --승신
 # ***************************************************************************************************
 @app.route('/tea/scrap', methods=['POST'])
+@jwt_required()
 def scrapTea():
+    current_user = get_jwt_identity().upper()
     name_receive = request.form['name_give']
-    scrap_list = db.tealist.find_one({'name': name_receive})
-    check_scrap = db.scraps.find_one({'name': name_receive})
+    scrap_list = db.tealist.find_one({'name': name_receive},{'_id':False})
+    check_scrap_name = db.scraps.find_one({'name': name_receive})
+    check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
-    if check_scrap is not None:
+    if check_scrap_name and check_scrap_id is not None:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         db.scraps.insert_one(scrap_list)
+        db.scraps.update_one({'name':name_receive},{'$set':{'user_id':current_user}})
         return jsonify({'successScrap': '찜 완료 되었습니다.'})
 
 @app.route('/tea/scrapList', methods=['GET'])
+@jwt_required()
 def showScrapTea():
-    scrap_list = list(db.scraps.find({}, {'_id': False}).sort("name"))
-    return jsonify({'scrapTeas': scrap_list})
+    current_user = get_jwt_identity().upper()
+    my_scrap_list = db.scraps.find_one({'user_id':current_user})
+    if my_scrap_list is not None:
+        scrap_list = list(db.scraps.find({'user_id':current_user}, {'_id': False}).sort("name"))
+        return jsonify({'scrapTeas': scrap_list})
+    else:
+        return jsonify({'msg': '비어있습니다'})
 
 @app.route('/tea/deleteScrap', methods=['POST'])
+@jwt_required()
 def delete_scrap():
     name_receive = request.form['name_give']
     db.scraps.delete_one({'name': name_receive})
     return jsonify({'msg': '삭제 완료'})
+
+
+
 
 @app.route('/tea/scrapPage')
 def scrapPage():
     return render_template('tea_scrap.html')
 
 # ***************************************************************************************************
-
-@app.route('/sign')
-def signup1_page():
-    return render_template('login.html')
 
 #***************************************************************************************************
 # mu-jun's function code
