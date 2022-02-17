@@ -4,6 +4,10 @@ from flask_jwt_extended import *
 from hashlib import *
 import datetime
 import chachaconfig
+import pandas as pd
+import json
+
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
@@ -37,7 +41,7 @@ db = client.dbchacha
 # **********************************************************
 
 
-# 차 정보 입력하기(POST) API
+# 차 정보 입력하기(POST) API _ 재영
 
 @app.route('/save', methods=['POST'])
 def save_tea():
@@ -59,6 +63,7 @@ def save_tea():
         'name': name_receive,
         #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
+        'eng_type' : eng_type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
@@ -74,9 +79,52 @@ def save_tea():
 
 @app.route('/')
 def home():
+    return render_template('recommend_tea.html')
+
+@app.route('/save_tea')
+def saveTea():
     return render_template('save_tea.html')
 
-# 티 정보 GET 하기 -- 영은
+
+# ***************************************************************************************************
+
+# 차 추천기능 (카테고리 선택에 의함) _ 재영
+
+@app.route('/recommend/find',methods=['POST'])
+def read_mongo():
+     df = pd.DataFrame(list(db.tealist.find({}, {'_id': False}).sort('name')))
+     selector_receive = request.get_json()
+     type_receive = selector_receive['type_give']
+     benefit_receive = selector_receive['benefit_give']
+     caffeineOX_receive = selector_receive['caffeineOX_give']
+
+     # type 컬럼을 선택합니다. 컬럼의 값과 조건을 비교합니다.그 결과를 새로운 변수에 할당합니다.
+     for i in range(len(type_receive)):
+        is_type = df['type'] == type_receive[i]
+
+     for i in range(len(benefit_receive)):
+        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
+
+     for i in caffeineOX_receive:
+        has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
+
+     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다.(AND)
+     subset_df = df[is_type & has_benefit & has_caffeine]
+
+     # JSON 형식으로 바꿔줍니다 (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
+     find_list = subset_df.to_json(orient = 'records',force_ascii=False)
+
+     return jsonify({'find_teas': find_list})
+
+@app.route('/recommend')  #검색창 부분 건드리지 않으려고 우선 따로 만들어봄, 병합시 삭제 또는 수정
+def recommend_page():
+   return render_template('recommend_tea.html')
+
+# ***************************************************************************************************
+
+
+# 티 정보 GET 하기 -- 영은/ like --승신
+
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
@@ -101,6 +149,10 @@ def likeTea():
 
     db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
     return jsonify({'msg': 'like +1'})
+
+
+
+
 # ***************************************************************************************************
 
 # scrap --승신
@@ -113,6 +165,7 @@ def scrapTea():
     scrap_list = db.tealist.find_one({'name': name_receive},{'_id':False})
     check_scrap_name = db.scraps.find_one({'name': name_receive})
     check_scrap_id = db.scraps.find_one({'user_id': current_user})
+
 
     if check_scrap_name and check_scrap_id is not None:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
