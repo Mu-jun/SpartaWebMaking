@@ -63,6 +63,7 @@ def save_tea():
         'name': name_receive,
         #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
+        'eng_type' : eng_type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
@@ -87,7 +88,7 @@ def saveTea():
 
 # ***************************************************************************************************
 
-# 차 추천기능 (카테고리 선택에 의함) 재영
+# 차 추천기능 (카테고리 선택에 의함) _ 재영
 
 @app.route('/recommend/find',methods=['POST'])
 def read_mongo():
@@ -97,21 +98,20 @@ def read_mongo():
      benefit_receive = selector_receive['benefit_give']
      caffeineOX_receive = selector_receive['caffeineOX_give']
 
-
      # type 컬럼을 선택합니다. 컬럼의 값과 조건을 비교합니다.그 결과를 새로운 변수에 할당합니다.
      for i in range(len(type_receive)):
         is_type = df['type'] == type_receive[i]
 
      for i in range(len(benefit_receive)):
-        have_benefit = df['benefit'].str.contains(benefit_receive[i])
+        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
 
      for i in caffeineOX_receive:
         has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
 
-     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다. (AND)
-     subset_df = df[is_type & have_benefit & has_caffeine]
+     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다.(AND)
+     subset_df = df[is_type & has_benefit & has_caffeine]
 
-     # JSON 형식으로 바꿔줍니다
+     # JSON 형식으로 바꿔줍니다 (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
      find_list = subset_df.to_json(orient = 'records',force_ascii=False)
 
      return jsonify({'find_teas': find_list})
