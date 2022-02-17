@@ -8,7 +8,7 @@ db = client.dbchacha
 # 위 사이트에서 CSV 파일을 JSON 파일로 변환한다.
 # 값을 아래에 붙여넣은 후, '찾아 바꾸기'(모두)를 이용하여 깨지는 부분들을 수정해 준다.
   # true 를 True 로 바꾼다.
-  # fals e를 False 로 바꾼다.
+  # false 를 False 로 바꾼다.
   # null 을 None 으로 바꾼다.
   # \/ 를 / 로 바꾼다.
   # "caffeine": 0, 을 "caffeine": "0", 으로 바꾼다. 카페인 함량이 있는 경우 10mg/200ml 과 같이 텍스트로 표현되기에 자료형 맞춰줌.
