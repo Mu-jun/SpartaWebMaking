@@ -1,0 +1,211 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+
+    <meta property="og:title" content="차茶정해봅시다"/>
+    <meta property="og:description" content="쉽게 알아보는 내게 맞는 차"/>
+    <meta property="og:image" content="/static/ogimage.jpg"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
+    <title>차 정보 가져오기</title>
+
+    <link rel="stylesheet" href="../static/style_get.css" />
+<!--    <script src="../static/script/script.js"></script>-->
+</head>
+
+
+<body>
+
+<div class="title">
+    <h1>차 추천받기(카테고리 선택)</h1>
+</div>
+
+   <!--검색창 추가-->
+    <div class='input-box'>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroup-sizing-default">차 이름</span>
+            </div>
+                <input type="text" id="teaName" class="form-control kw" onkeyup="enter()">
+                <button onclick="search()" class="btn btn-outline-secondary" type="button" id="btn_search" href="javascript:enter();">찾기</button>
+            </div>
+    </div>
+
+    <div id="box">
+
+    </div>
+
+    <!--추천기능 추가-->
+
+
+<div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">차 종류</span>
+            </div>
+            <div class='checktype'>
+                <input type='checkbox' name='type' value='백차'/> 백차
+                <input type='checkbox' name='type' value='녹차'/> 녹차
+                <input type='checkbox' name='type' value='홍차'/> 홍차
+                <input type='checkbox' name='type' value='황차'/> 황차
+                <input type='checkbox' name='type' value='청차'/> 청차
+                <input type='checkbox' name='type' value='흑차'/> 흑차
+                <input type='checkbox' name='type' value='대용차'/> 기타
+            </div>
+        </div>
+
+
+<div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">효능 (복수)</span>
+            </div>
+            <div class='checkbenefit'>
+                <input type='checkbox' name='benefit' value='다이어트'/> 다이어트
+                <input type='checkbox' name='benefit' value='피부미용'/> 피부미용
+                <input type='checkbox' name='benefit' value='피로회복'/> 피로회복
+                <input type='checkbox' name='benefit' value='면역증진'/> 면역증진
+                <input type='checkbox' name='benefit' value='혈액순환'/> 혈액순환
+                <input type='checkbox' name='benefit' value='소화기능'/> 소화기능
+                <input type='checkbox' name='benefit' value='질병예방'/> 질병예방
+                <input type='checkbox' name='benefit' value='정신건강'/> 정신건강
+            </div>
+        </div>
+
+<div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">효능 (복수)</span>
+            </div>
+            <div class='checkcaffeine'>
+                <input type='checkbox' name='caffeineOX' value='true' /> 카페인
+                <input type='checkbox' name='caffeineOX' value='false'/> 디카페인
+            </div>
+        </div>
+
+<button type="button" onclick="find_tea()" class="btn btn-primary btn-save">찾아볼까요</button>
+
+<script>
+
+    $(document).ready(function () {
+
+    });
+
+    function find_tea() {
+        /*차 종류 선택사항 추출 */
+        const typequery = 'input[name="type"]:checked';
+        const selectedTypes =
+            document.querySelectorAll(typequery);
+        let type = '';
+        var typecount = 0;
+        selectedTypes.forEach((el) => {
+            if (++typecount == selectedTypes.length) {
+                type += el.value
+            } else {
+                type += el.value + ','
+            }
+        });
+        if (type === '') {
+            type += "백차,녹차,홍차,황차,청차,흑차,대용차" /*선택 안하면 전부 선택한 것으로 처리*/
+        }
+        const typearr = type.split(','); /*선택한 차의 종류를 list 형태로 만들어줌*/
+
+        /*차 효능 선택사항 추출 */
+        const benefitquery = 'input[name="benefit"]:checked';
+        const selectedBenefit =
+            document.querySelectorAll(benefitquery);
+        let benefit = '';
+        var benecount = 0;
+        selectedBenefit.forEach((el) => {
+            if (++benecount == selectedBenefit.length) {
+                benefit += el.value
+            } else {
+                benefit += el.value + ','
+            }
+        });
+        if (benefit === '') {
+            benefit += "다이어트,피부미용,피로회복,면역증진,혈액순환,소화기능,질병예방,정신건강" /*선택 안하면 전부 선택한 것으로 처리*/
+        }
+        let benefitarr = benefit.split(',');
+
+        /*차 카페인 선택사항 추출 */
+        const caffquery = 'input[name="caffeineOX"]:checked';
+        const selectedCaffeine =
+            document.querySelectorAll(caffquery);
+        let caffeineOX = ""
+        if (selectedCaffeine.length != 1) {
+            caffeineOX = [true, false]
+        } else if (selectedCaffeine == "true") {
+            caffeineOX = [true]
+        } else {
+            caffeineOX = [false]
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "/recommend/find",
+            headers: {'Content-Type': 'application/json'},
+            dataType: 'json',
+            data: JSON.stringify({
+                    type_give : typearr,
+                    benefit_give : benefitarr,
+                    caffeineOX_give : caffeineOX,
+                   }),
+            success: function (response) {
+                $('#box').empty()
+                let Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
+                for(let i =0; i<Tea.length; i++){
+                        let name = Tea[i]['name']
+                        let type = Tea[i]['type']
+                        let benefit = Tea[i]['benefit']
+                        let caffeineOX = Tea[i]['caffeineOX']
+                        let caffeine = Tea[i]['caffeine']
+                        let benefitdetail = Tea[i]['benefitdetail']
+                        let desc = Tea[i]['desc']
+                        let caution = Tea[i]['caution']
+                        let img = Tea[i]['img']
+                        let like = Tea[i]['like']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea()" class="btn btn-outline-secondary">좋아요</button></p>
+                                         <p><button class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                }
+            }
+        })
+    }
+
+</script>
+
+</body>
+
+</html>

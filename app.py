@@ -4,9 +4,12 @@ from flask_jwt_extended import *
 from flask_bcrypt import *
 import hashlib
 from hashlib import *
-import jwt
 import datetime
 import chachaconfig
+import pandas as pd
+import json
+
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
@@ -40,7 +43,7 @@ db = client.dbchacha
 # **********************************************************
 
 
-# 차 정보 입력하기(POST) API
+# 차 정보 입력하기(POST) API _ 재영
 
 @app.route('/save', methods=['POST'])
 def save_tea():
@@ -62,6 +65,7 @@ def save_tea():
         'name': name_receive,
         #'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
         'type': type_receive,
+        'eng_type' : eng_type_receive,
         'benefit': benefit_receive,
         'caffeineOX': caffeineOX_receive,
         'caffeine': caffeine_receive,
@@ -77,9 +81,52 @@ def save_tea():
 
 @app.route('/')
 def home():
+    return render_template('recommend_tea.html')
+
+@app.route('/save_tea')
+def saveTea():
     return render_template('save_tea.html')
 
+
+# ***************************************************************************************************
+
+# 차 추천기능 (카테고리 선택에 의함) _ 재영
+
+@app.route('/recommend/find',methods=['POST'])
+def read_mongo():
+     df = pd.DataFrame(list(db.tealist.find({}, {'_id': False}).sort('name')))
+     selector_receive = request.get_json()
+     type_receive = selector_receive['type_give']
+     benefit_receive = selector_receive['benefit_give']
+     caffeineOX_receive = selector_receive['caffeineOX_give']
+
+     # type 컬럼을 선택합니다. 컬럼의 값과 조건을 비교합니다.그 결과를 새로운 변수에 할당합니다.
+     for i in range(len(type_receive)):
+        is_type = df['type'] == type_receive[i]
+
+     for i in range(len(benefit_receive)):
+        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
+
+     for i in caffeineOX_receive:
+        has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
+
+     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다.(AND)
+     subset_df = df[is_type & has_benefit & has_caffeine]
+
+     # JSON 형식으로 바꿔줍니다 (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
+     find_list = subset_df.to_json(orient = 'records',force_ascii=False)
+
+     return jsonify({'find_teas': find_list})
+
+@app.route('/recommend')  #검색창 부분 건드리지 않으려고 우선 따로 만들어봄, 병합시 삭제 또는 수정
+def recommend_page():
+   return render_template('recommend_tea.html')
+
+# ***************************************************************************************************
+
+
 # 티 정보 GET 하기 -- 영은/ like --승신
+
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
@@ -89,8 +136,12 @@ def getTea():
 @app.route('/tea')
 def teaList():
     return render_template('get_tea.html')
+# ***************************************************************************************************
 
+# like (seung)
+# ***************************************************************************************************
 @app.route('/tea/like', methods=['POST'])
+@jwt_required()
 def likeTea():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
@@ -98,79 +149,59 @@ def likeTea():
 
     new_like = current_like + 1
 
-    db.mystar.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
     return jsonify({'msg': 'like +1'})
+
+
+
+
 # ***************************************************************************************************
 
+# scrap (seung)
+# ***************************************************************************************************
+@app.route('/tea/scrap', methods=['POST'])
+@jwt_required()
+def scrapTea():
+    current_user = get_jwt_identity().upper()
+    name_receive = request.form['name_give']
+    scrap_list = db.tealist.find_one({'name': name_receive},{'_id':False})
+    check_scrap = db.scraps.find_one({'user_id': current_user})
 
-# 회원가입 및 로그인, 로그인 테스트 페이지 코드 test by 승신
-#***************************************************************************************************
-
-# [회원가입 API]
-# id, pw, nickname을 받아서, mongoDB에 저장합니다.
-# 저장하기 전에, pw를 sha256 방법(=단방향 암호화. 풀어볼 수 없음)으로 암호화해서 저장합니다.
-@app.route('/sign/signup', methods=['POST'])
-def api_register():
-    id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
-    pw_cf_receive = request.form['pw_cf_give']
-    nickname_receive = request.form['nickname_give']
-
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-
-    doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive}
-
-    if result is not None:
-        return jsonify({'fail': '아이디/패스워드/닉네임이 중복된다.'})
+    if check_scrap is not None:
+        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
-        if pw_receive == pw_cf_receive:
-            doc2 = {'id': id_receive, 'pw': pw_hash, 'nick': nickname_receive,}
-            db.user.insert_one(doc2)
-            return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
-        else:
-            return jsonify({'result2': '비밀번호가 다른데?'})
+        db.scraps.insert_one(scrap_list)
+        db.scraps.update_one({'name':name_receive},{'$set':{'user_id':current_user}})
+        return jsonify({'successScrap': '찜 완료 되었습니다.'})
 
-    return jsonify({'result': '어, 그래 가입 됐다. 가라.'})
-
-# [로그인 API]
-# id, pw를 받아서 맞춰보고, 토큰을 만들어 발급합니다.
-@app.route('/sign/log_in', methods=['POST'])
-def api_login():
-    id_receive = request.form['id_give']
-    pw_receive = request.form['pw_give']
-
-    # 회원가입 때와 같은 방법으로 pw를 암호화합니다.
-    pw_hash = hashlib.sha256(pw_receive.encode('utf-8')).hexdigest()
-
-    # id, 암호화된pw을 가지고 해당 유저를 찾습니다.
-    result = db.user.find_one({'id': id_receive, 'pw': pw_hash})
-
-    # 찾으면 JWT 토큰을 만들어 발급합니다.
-    if result is not None:
-        # JWT 토큰에는, payload와 시크릿키가 필요합니다.방법
-        # 시크릿키가 있어야 토큰을 디코딩(=풀기) 해서 payload 값을 볼 수 있습니다.
-        # 아래에선 id와 exp를 담았습니다. 즉, JWT 토큰을 풀면 유저ID 값을 알 수 있습니다.
-        # exp에는 만료시간을 넣어줍니다. 만료시간이 지나면, 시크릿키로 토큰을 풀 때 만료되었다고 에러가 납니다.
-        payload = {
-            'id': id_receive,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=900)
-        }
-
-        SECRET_KEY = "I'M SECRET SEUNGSHIN BRO"
-
-        token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-
-        # token을 줍니다.
-        return jsonify({'success': '어 그래 로그인 됐다. 와라.', 'token': token})
-    # 찾지 못하면
+@app.route('/tea/scrapList', methods=['GET'])
+@jwt_required()
+def showScrapTea():
+    current_user = get_jwt_identity().upper()
+    my_scrap_list = db.scraps.find_one({'user_id':current_user})
+    if my_scrap_list is not None:
+        scrap_list = list(db.scraps.find({'user_id':current_user}, {'_id': False}).sort("name"))
+        return jsonify({'scrapTeas': scrap_list})
     else:
-        return jsonify({'fail': '너 뭐 잘못 했냐?'})
+        return jsonify({'msg': '비어있습니다'})
+
+@app.route('/tea/deleteScrap', methods=['POST'])
+@jwt_required()
+def delete_scrap():
+    name_receive = request.form['name_give']
+    db.scraps.delete_one({'name': name_receive})
+    return jsonify({'msg': '삭제 완료'})
+
+
+
+
+@app.route('/tea/scrapPage')
+def scrapPage():
+    return render_template('tea_scrap.html')
+
+# ***************************************************************************************************
 
 @app.route('/sign')
-def signup_page():
-   return render_template('01_login.html')
-
-@app.route('/sign1')
 def signup1_page():
     return render_template('login.html')
 
@@ -179,13 +210,14 @@ def signup1_page():
 
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
+
 def checkID():
+
     print('checkID start')
-    
+
     id_receive = request.get_json().upper()
-    
     result = db.users.find_one({'id': id_receive})
-    
+
     if result is not None:
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
@@ -204,14 +236,16 @@ def checkNickname():
     else:
         return jsonify({'success': '사용 가능한 별명입니다.'})
 
+# 반복 솔팅?
 def hash_pass(password, id):
+
     personal_key = id[:8].encode('utf-8')
     password = password+chachaconfig.salt_key
-    
+
     for i in range(chachaconfig.iteration_num):
         password = password.encode('utf-8')
         password = blake2s(password,person=personal_key).hexdigest()
-        
+
     return password
 
 @app.route('/sign/signup_test', methods=['POST'])
@@ -397,36 +431,3 @@ def sign_page():
 #***************************************************************************************************
 if __name__ == '__main__':
    app.run('0.0.0.0',port=5000,debug=True)
-
-"""    #GET요청API코드
-@app.route('/test', methods=['GET'])
-def test_get():
-   title_receive = request.args.get('title_give')
-   print(title_receive)
-   return jsonify({'result':'success', 'msg': '이 요청은 GET!'})
-#GET확인코드
-# $.ajax({
-#     type: "GET",
-#     url: "/test?title_give=봄날은간다",
-#     data: {},
-#     success: function(response){
-#        console.log(response)
-#     }
-#   })
-
-#POST요청API코드
-@app.route('/test', methods=['POST'])
-def test_post():
-   title_receive = request.form['title_give']
-   print(title_receive)
-   return jsonify({'result':'success', 'msg': '이 요청은 POST!'})
-   
-#POST확인코드
-# $.ajax({
-#     type: "POST",
-#     url: "/test",
-#     data: { title_give:'봄날은간다' },
-#     success: function(response){
-#        console.log(response)
-#     }
-#   }) """
