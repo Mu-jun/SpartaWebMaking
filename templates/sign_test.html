@@ -121,46 +121,66 @@
             return result;
         }
 
-        function test_signin() {
-            let id = $('#signin_id').val();
-            let pass = $('#signin_pass').val();
-            
-            $.ajax({
-                type: "POST",
-                url: "/sign/signin",
-                data: { 
-                    id_give: id,
-                    pass_give: pass,                    
-                },
-                success: function(response){
-                    if(response['success']) {
-                        alert(response['success']);
-                        insert_user_token(id)
-                        window.location.reload();
-                    } 
-                    else alert(response['fail'])
-                }
-            })
+        let isLogin = false;
+
+        function signinout() {
+            if(isLogin){
+                signout_mode();
+                insert_user_token();
+            }else{
+                let id = $('#signin_id').val();
+                let pass = $('#signin_pass').val();
+                
+                $.ajax({
+                    type: "POST",
+                    url: "/sign/signin",
+                    data: { 
+                        id_give: id,
+                        pass_give: pass,                    
+                    },
+                    success: function(response){
+                        if(response['success']) {
+                            alert(response['success']);
+                            insert_user_token(id);                                                       
+                            window.location.reload();
+                        } 
+                        else alert(response['fail'])
+                    }
+                })
+            }
         }
 
         function insert_user_token(user_id) {
 
             console.log(user_id);
 
-            $.ajax({
-                type: "POST",
-                url: "/set_access_token",
-                data: {
-                    id_give: user_id
-                }                
-            })
-            $.ajax({
-                type: "POST",
-                url: "/set_refresh_token",
-                data: {
-                    id_give: user_id
-                }                
-            })            
+            let access_token_url = "/set_access_token";
+            let refresh_token_url = "/set_refresh_token";
+            
+            if(user_id) {
+                console.log('로그인')
+
+                $.ajax({
+                    type: "POST",
+                    url: access_token_url,
+                    data: {
+                        id_give: user_id
+                    }                
+                })
+                $.ajax({
+                    type: "POST",
+                    url: refresh_token_url,
+                    data: {
+                        id_give: user_id
+                    }                
+                })
+            }else {
+                console.log('로그아웃')
+
+                fetch(access_token_url);
+                fetch(refresh_token_url);
+            }
+
         }
 
         async function get_access_token() {
@@ -205,6 +225,20 @@
             })
         }
 
+        function signin_mode() {
+            isLogin = true;
+            $('#signupPage').hide();
+            $('#signinPage').hide();
+            $('#signinoutBtn').text('로그아웃');
+        }
+
+        function signout_mode() {
+            isLogin = false;
+            $('#signupPage').show();
+            $('#signinPage').show();
+            $('#signinoutBtn').text('로그인');
+        }
+
         async function check_token() {
 
             let date = new Date();
@@ -217,8 +251,7 @@
             let access_payload_exp = get_payload_exp(access_token);            
 
             if(access_payload_exp > numberic_date) {
-                $('#singupPage').hide();
-                $('#singinPage').hide();
+                signin_mode();
             } else {
                 let refresh_token = await get_access_token();
                 console.log(refresh_token);
@@ -229,8 +262,7 @@
                 if(refresh_payload_exp > numberic_date) {
                     refreshing_token();
                 } else {
-                    $('#singupPage').show();
-                    $('#singinPage').show();
+                    signout_mode();
                 }
 
             }
@@ -252,14 +284,17 @@
             }
         }
 
-        function test_change_pass() {
+        async function test_change_pass() {
             if(isPassiblePassword) {
                 let current_pass = $('#current_pass').val();
                 let new_pass = $('#new_pass').val();
-
+                await check_token();   
+                let access_token = await get_access_token();
+                
                 $.ajax({
                     type: "POST",
                     url: "/sign/change_pass",
+                    headers: {"Authorization": "Bearer "+ access_token},
                     data: {                        
                         pass_give: current_pass,
                         new_pass_give: new_pass                    
@@ -270,8 +305,7 @@
                             window.location.reload();
                         } 
                         else if(response['fail']) {
-                            alert(response['fail']);
-                            window.location.reload();
+                            alert(response['fail']);                            
                         }
                     }
                 })
@@ -289,7 +323,7 @@
 </head>
 <body>
 <div id='bodywrap'>
-    <div id='singupPage'>
+    <div id='signupPage'>
         <h1>회원가입 페이지</h1>
         <h5>아이디, 패스워드, 별명을 입력해주세요</h5>
 
@@ -300,26 +334,26 @@
         <p id="checkNicknameText"></p>            
         <button type="button" onclick="test_signup();">가입하기</button>
     </div>
-    <div id='singinPage'>
+    <div id='signinPage'>
         <h1>로그인 페이지</h1>
         <h5>아이디, 패스워드를 입력해주세요</h5>
 
         <p>ID: <input type="text" id="signin_id"/></p>
         
         <p>PW: <input type="password" id="signin_pass"/></p>
-        
-        <button type="button" onclick="test_signin();">로그인하기</button>
+                
     </div>
+    <button type="button" id='signinoutBtn' onclick="signinout();">로그인</button>
     <div>
         <h1>비밀변호 변경 페이지</h1>
         <h5>기존 비밀번호와 새로운 비밀번호를 입력해주세요</h5>
 
-        <p>기본 비밀번호: <input type="text" id="current_pass"/></p>
+        <p>기본 비밀번호: <input type="password" id="current_pass"/></p>
         
         <p>새로운 비밀번호: <input type="password" id="new_pass" oninput="check_change_password();"/></p>
         <p>새로운 비밀번호확인: <input type="password" id="new_pass_check" oninput="check_change_password();"/></p>
         <p id="checkPasswordText"></p>
-        <button type="button" onclick="test_change_pass();">변경하기</button>
+        <button type="button" onclick="test_change_pass();">비밀번호변경</button>
     </div>
     <div>
         <h1>회원탈퇴 페이지</h1>
@@ -329,7 +363,7 @@
         
         <p>PW: <input type="password" id="user_pass"/></p>
         
-        <button type="button" onclick="test_delete_user();">로그인하기</button>
+        <button type="button" onclick="test_delete_user();">탈퇴하기</button>
     </div>
 </div>
 </body>
