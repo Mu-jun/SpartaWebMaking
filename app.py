@@ -27,14 +27,14 @@ app.config['SESSION_COOKIE_SECURE'] = True
 jwt = JWTManager(app)
 
 # DB 관련
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 
 
 # 서버 db 사용시 로컬 db 주석 처리, 로컬 db 사용시 서버 db 주석 처리
 # **********************************************************
 
-# client = MongoClient('localhost', 27017)
-client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+client = MongoClient('localhost', 27017)
+# client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
 
 db = client.dbchacha
 
@@ -162,7 +162,6 @@ def likeTea():
 def scrapTea():
     current_user = get_jwt_identity().upper()
     name_receive = request.form['name_give']
-    scrap_list = db.tealist.find_one({'name': name_receive},{'_id':False})
     check_scrap_name = db.scraps.find_one({'name': name_receive})
     check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
@@ -170,8 +169,9 @@ def scrapTea():
     if check_scrap_name and check_scrap_id is not None:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
+        db.tealist.update_one({'name': name_receive},{'$set':{'user_id':current_user}},True)
+        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
         db.scraps.insert_one(scrap_list)
-        db.scraps.update_one({'name':name_receive},{'$set':{'user_id':current_user}})
         return jsonify({'successScrap': '찜 완료 되었습니다.'})
 
 @app.route('/tea/scrapList', methods=['GET'])
