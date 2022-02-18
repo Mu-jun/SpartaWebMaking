@@ -1,33 +1,17 @@
 // signup
 async function sign_checkID(id) {
-    let isPassibleID = false;
-
     let response = await fetch('/sign/checkID', {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json;charset=utf-8'
+            'Content-Type': 'application/json;charset=utf-8'
         },
         body: JSON.stringify(id)
     }).then(result=>result.json());
     
-    let result = '';
-
-    if(response['success']) {
-        isPassibleID = true;
-        result = response['success'];
-    }else if (response['fail']) {
-        result = response['fail'];
-    }    
-
-    return {
-        'isPassible': isPassibleID,
-        'msg' : result
-    }
-    
+    return response;    
 }
 
-async function sign_checkNickname(nickname) {
-    let isPassibleNickname = false;
+async function sign_checkNickname(nickname) {    
     let response = await fetch('/sign/checkNickname', {
         method: 'POST',
         headers: {
@@ -36,20 +20,7 @@ async function sign_checkNickname(nickname) {
         body: JSON.stringify(nickname)
     }).then(result=>result.json());
 
-    let result = '';
-
-    if(response['success']) {
-        isPassibleNickname = true;
-        result = response['success'];
-    }else if (response['fail']) {
-        result = response['fail'];
-    }    
-
-    return {
-        'isPassible': isPassibleNickname,
-        'msg' : result
-    }
-
+    return response;
 }
 
 async function sign_signup(id,password,nickname) {
@@ -152,8 +123,8 @@ function get_payload_exp(token) {
     return +exp;
 }
 
-async function check_token() {
-    let isToken = false;
+async function sign_checkSign() {
+    let isSign = false;
     let date = new Date();
     let numberic_date = parseInt(date/1000)           
     
@@ -163,23 +134,23 @@ async function check_token() {
         let access_payload_exp = get_payload_exp(access_token);            
 
         if(access_payload_exp > numberic_date) {
-            isToken = true;
+            isSign = true;
         } else {
             let refresh_token = await get_access_token();                        
             let refresh_payload_exp = get_payload_exp(refresh_token);            
 
             if(refresh_payload_exp > numberic_date) {
                 refresh();
-                isToken = true;
+                isSign = true;
             }
             
         }
     }
-    return isToken;
+    return isSign;
 }
 
 // sign information change
-async function signDelete(password) {
+async function sign_Delete(password) {
     await check_token();
     let access_token = await get_access_token();
 
@@ -195,7 +166,7 @@ async function signDelete(password) {
     return response;
 }
 
-async function signChangePassword(currentPassword,newPassword) {
+async function sign_ChangePassword(currentPassword,newPassword) {
     await check_token();   
     let access_token = await get_access_token();
     let response = await fetch('/sign/change_pass',{

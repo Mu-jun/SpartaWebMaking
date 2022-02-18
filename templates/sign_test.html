@@ -34,10 +34,11 @@
 
             let result = await sign_checkID(id);
 
-            isPassibleID = result.isPassible;
-            alert(result.msg);
-
-            if(isPassibleID) $('#checkIDText').text('중복확인완료');
+            if(result['success']) {
+                isPassibleID = True;
+                alert(result['success']);
+                $('#checkIDText').text('중복확인완료');
+            } else alert(result['fail'])            
         }
     //  Check nickname
         let isPassibleNickname = false;
@@ -52,11 +53,11 @@
             let nickname = $('#signup_nick').val();
 
             let result = await sign_checkNickname(nickname);
-
-            isPassibleNickname = result.isPassible;
-            alert(result.msg);
-
-            if(isPassibleNickname) $('#checkNicknameText').text('중복확인완료');            
+            if(result['success']) {
+                isPassibleNickname = True;
+                alert(result['success']);
+                $('#checkNicknameText').text('중복확인완료');
+            } else alert(result['fail']);      
         }
     //  signup
         async function test_signup() {
@@ -83,7 +84,7 @@
         let isLogin = false;
 
         async function signStatus() {
-            isLogin = await check_token();
+            isLogin = await sign_checkSign();
             if(isLogin) signin_mode();
             else signout_mode();
         }
@@ -143,7 +144,7 @@
                 let current_pass = $('#current_pass').val();
                 let new_pass = $('#new_pass').val();
 
-                let response = await signChangePassword(current_pass,new_pass);
+                let response = await sign_ChangePassword(current_pass,new_pass);
                 
                 if(response['success']) {
                     alert(response['success']);
@@ -163,7 +164,7 @@
             let password = $('#user_pass').val();
             console.log(password)
 
-            let response = await signDelete(password);
+            let response = await sign_Delete(password);
             console.log(response)
 
             if(response['success']) {
