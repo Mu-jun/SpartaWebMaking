@@ -1,12 +1,14 @@
 
+from urllib import response
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
+from flask_bcrypt import *
+import hashlib
 from hashlib import *
 import datetime
 import chachaconfig
 import pandas as pd
 import json
-
 
 
 app = Flask(__name__)
@@ -19,8 +21,13 @@ app.config['JSON_AS_ASCII'] = False #한글 깨짐 현상 해결코드
 app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
+app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
+app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
+#app.config['JWT_TOKEN_LOCATION'] = ["cookies","headers"]
+
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
+
 
 # configure Flask App with JWT support
 # JWT 지원으로 Flask App 구성
@@ -89,30 +96,47 @@ def saveTea():
 # ***************************************************************************************************
 
 # 차 추천기능 (카테고리 선택에 의함) _ 재영
+# 대체 어제는 왜 for문을 돌렸는데 됐을까? 명백히 논리적으로 오류인데 어째서 결과가 나왔던 걸까?
+# 어쨌든 더 찾아보고 더 파서 해냈다 ㄱㄱㅌㄱ
 
-@app.route('/recommend/find',methods=['POST'])
+@app.route('/recommend/find', methods=['POST'])
 def read_mongo():
-     df = pd.DataFrame(list(db.tealist.find({}, {'_id': False}).sort('name')))
+     # df_all : Pandas(패키지)로 데이터프레임 형태를 만들어, DB 전체를 불러온다.
+     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
      selector_receive = request.get_json()
      type_receive = selector_receive['type_give']
      benefit_receive = selector_receive['benefit_give']
      caffeineOX_receive = selector_receive['caffeineOX_give']
 
-     # type 컬럼을 선택합니다. 컬럼의 값과 조건을 비교합니다.그 결과를 새로운 변수에 할당합니다.
-     for i in range(len(type_receive)):
-        is_type = df['type'] == type_receive[i]
+     print (type_receive)
 
+     # df_type : 전체 데이터프레임(df_all)에서 type이 '같은' 항목들만 받아서 새로 데이터프레임을 만든다.
+     df_type = df_all.loc[df_all['type'].isin(type_receive)]
+     df_type.head()
+
+     # benequery : 데이터프레임에서 어떤 조건으로 검색할지 query문을 만들어주기 위한 문자 함수이다.
+     # 입력받는 효능의 갯수가 불확실한 상황에서, DB상의 "효능"란에 입력받은 값이 '포함' 되는지를 비교할 기능을 찾지 못했다.
+     # 우리가 입력받은 효능 값의 개수만큼 for 문을 돌려서 아래와 같이 query 문을 만들었다.
+     # 예시: (@df_type['benefit'].str.contains ('다이어트')) or (@df_type['benefit'].str.contains('피부미용'))
+
+     benequery = f"(@df_type['benefit'].str.contains ('"
      for i in range(len(benefit_receive)):
-        has_benefit = df['benefit'].str.contains(benefit_receive[i]) #위 type과 같은 구조임
+        if i < len(benefit_receive)-1:
+            benequery += benefit_receive[i] + f"')) or (@df_type['benefit'].str.contains('"
+        else:
+            benequery += benefit_receive[i] + f"'))"
+     print (benequery)
 
-     for i in caffeineOX_receive:
-        has_caffeine = df['caffeineOX'] == caffeineOX_receive[i]
+     #df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
+     df_benefit = df_type.query(benequery)
+     df_benefit.head()
 
-     # 세가지 조건을 동시에 충족하는 데이터를 필터링하여 새로운 변수에 저장합니다.(AND)
-     subset_df = df[is_type & has_benefit & has_caffeine]
+     # df_caffeine : benefit 으로 걸러낸 데이터프레임(df_benefit) 중에서, caffeineOX가 '같은' 항목들만 받아서 새로운 데이터프레임을 만든다.
+     df_caffeine = df_benefit.loc[df_benefit['caffeineOX'].isin(caffeineOX_receive)]
+     df_caffeine.head()
 
-     # JSON 형식으로 바꿔줍니다 (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
-     find_list = subset_df.to_json(orient = 'records',force_ascii=False)
+     # 다 걸러진 결과값을 JSON 형식으로 바꿔준다. (JSON 형식을 갖는 string으로 저장됨! 클라이언트에서 parsing)
+     find_list = df_caffeine.to_json(orient = 'records',force_ascii=False)
 
      return jsonify({'find_teas': find_list})
 
@@ -204,7 +228,7 @@ def scrapPage():
 #***************************************************************************************************
 # mu-jun's function code
 
-
+#  signup
 @app.route('/sign/checkID', methods=['POST'])
 
 def checkID():
@@ -244,13 +268,16 @@ def hash_pass(password, id):
 
     return password
 
-@app.route('/sign/signup_test', methods=['POST'])
+@app.route('/sign/signup', methods=['POST'])
 def signup():
     print('signup start')
     
-    id_receive = request.form['id_give'].upper()
-    pass_receive = request.form['pass_give']
-    nickname_receive = request.form['nickname_give'].upper()
+    receive = request.get_json();
+    print(receive)
+    
+    id_receive = receive['id_give'].upper()
+    pass_receive = receive['pass_give']
+    nickname_receive = receive['nickname_give'].upper()
     
     hashed_password = hash_pass(pass_receive,id_receive)
            
@@ -265,99 +292,94 @@ def signup():
     
     return jsonify({'success': '가입완료!'})
 
+#sign in
 @app.route('/sign/signin', methods=['POST'])
 def api_signin():
     print('signin start')
+    response = make_response(render_template('/sign_test.html'))
+    receive = request.get_json();
     
-    id_receive = request.form['id_give'].upper()
-    pass_receive = request.form['pass_give']
+    id_receive = receive['id_give'].upper()
+    pass_receive = receive['pass_give']
     
     print(id_receive)
     
     hashed_password = hash_pass(pass_receive,id_receive)
     
-    user = db.users.find_one({'id':id_receive})
-    
+    user = db.users.find_one({'id':id_receive})    
     print(user)
+    
     if(user):
         if(hashed_password == user['password']):
-            access_token = create_access_token(identity=user['id'])
+            response = jsonify({'success':'환영합니다.'+user['nickname']+'님'})
+            
+            access_token = create_access_token(identity=user['id'])            
+            response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True)
+            
             refresh_token = create_refresh_token(identity=user['id'])
-        
-            return jsonify({'success':'환영합니다.'+user['nickname']+'님','access_token':access_token, 'refresh_token':refresh_token})
+            response.set_cookie('chachaRefreshToken', value=refresh_token, samesite = None, httponly=True)
+            
+            return response
     else:
         return jsonify({'fail':'ID와 비밀번호를 확인해주세요.'})
     
-#cookie
+#cookie 토큰관리
 
-@app.route('/set_access_token', methods=['GET', 'POST'])
+@app.route('/unset_token', methods=['GET'])
 def set_access_token():
-    print('set_access_token start')
-    
+    print('unset_token start')    
     response = make_response(render_template('/sign_test.html'))
-    
-    if request.method == "POST":
-        user_id = request.form['id_give']
-    
-        if(user_id):
-            access_token = create_access_token(identity=user_id)
-            
-            response.set_cookie('chachaAccessToken', value=access_token) #path='/localhost', domain='/localhost', httponly=True
-        else:
-            response.delete_cookie('chachaAccessToken')
-    else:
-        response.delete_cookie('chachaAccessToken')
+        
+    response.delete_cookie('chachaAccessToken')
+    response.delete_cookie('chachaRefreshToken')
              
     return response
-        
-@app.route('/set_refresh_token', methods=['GET', 'POST'])
-def set_refresh_token():
-    print('set_refresh_token start')
-    
-    response = make_response(render_template('/sign_test.html'))
-    
-    if request.method == 'POST':
-        user_id = request.form['id_give']
-        
-        if(user_id):
-            refresh_token = create_refresh_token(identity=user_id)            
-            response.set_cookie('chachaRefreshToken', value=refresh_token)
-        else:
-            response.delete_cookie('chachaRefreshToken')
-    else:
-        response.delete_cookie('chachaRefreshToken')
-        
-    return response
-
+  
 @app.route('/get_access_token', methods=['GET'])
-def get_access_token():
+def api_get_access_token():
     print('get_access_token start')
     
-    result = request.cookies.get('chachaAccessToken')
+    result = request.cookies.get('chachaAccessToken')    
     
-    return result
-        
+    if result is not None:
+        return jsonify(result)
+    else:
+        return jsonify(None)
+            
 @app.route('/get_refresh_token', methods=['GET'])
-def get_refresh_token():
+def api_get_refresh_token():
     print('get_refresh_token start')
     
     result = request.cookies.get('chachaRefreshToken')
+    print(result)
+    if result is not None:
+        return jsonify(result)
+    else:
+        return jsonify(None)
     
-    return result
+@app.route('/refresh', methods=['GET'])
+@jwt_required(refresh=True)
+def refresh():
+    print('refresh start')
     
-    
+    current_user = get_jwt_identity()
+    access_token = create_access_token(identity=current_user)
+    return jsonify(access_token=access_token, current_user=current_user)
 
+#sign information 유저정보변경
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
     print('change_pass start')
-    current_user = get_jwt_identity().upper()
-    
-    print(type(current_user))
+    current_user = get_jwt_identity().upper()        
     print(current_user)
     
-    pass_receive = request.form['pass_give']
-    new_password = request.form['new_pass_give']
+    print(request.get_data())
+    receive = request.get_json()
+    print(receive)
+    
+    pass_receive = receive['pass_give']
+    new_password = receive['new_pass_give']
     
     hashed_password = hash_pass(pass_receive,current_user)
     new_password = hash_pass(new_password,current_user)
@@ -379,19 +401,26 @@ def api_change_pass():
 def api_delete_user():
     print('delete_user start')
     
-    current_user = get_jwt_identity()
+    current_user = get_jwt_identity().upper()
+    receive = request.get_json()
+    password = receive['pass_give']    
     
-    return jsonify({'success':'회원탈퇴완료'})
-
-@app.route('/refresh', methods=['GET'])
-@jwt_required(refresh=True)
-def refresh():
-    print('refresh start')
+    hashed_password = hash_pass(password,current_user)
     
-    current_user = get_jwt_identity()
-    access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
-
+    user = db.users.find_one({'id':current_user})
+        
+    if(user):        
+        if(hashed_password == user['password']):            
+            db.users.delete_one({'id':current_user})            
+            print('success')
+            return jsonify({'success':'탈퇴하셨습니다.'})            
+        else:
+            print('fail2')
+            return jsonify({'fail':'기존 비밀번호가 틀렸습니다.'})
+    else:
+        print('fail1')
+        return jsonify({'fail':'로그인 먼저 해주세요.'})
+    
 @app.route('/sign_test')
 def sign_page():
    return render_template('sign_test.html')

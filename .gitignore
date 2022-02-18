@@ -1,4 +1,7 @@
-__pycashe__/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
 .idea/
 venv/
 chachaconfig.py
