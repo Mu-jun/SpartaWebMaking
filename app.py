@@ -91,7 +91,7 @@ def saveTea():
 # 대체 어제는 왜 for문을 돌렸는데 됐을까? 명백히 논리적으로 오류인데 어째서 결과가 나왔던 걸까?
 # 어쨌든 더 찾아보고 더 파서 해냈다 ㄱㄱㅌㄱ
 
-@app.route('/recommend/find',methods=['POST'])
+@app.route('/recommend/find', methods=['POST'])
 def read_mongo():
      # df_all : Pandas(패키지)로 데이터프레임 형태를 만들어, DB 전체를 불러온다.
      df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
@@ -99,6 +99,8 @@ def read_mongo():
      type_receive = selector_receive['type_give']
      benefit_receive = selector_receive['benefit_give']
      caffeineOX_receive = selector_receive['caffeineOX_give']
+
+     print (type_receive)
 
      # df_type : 전체 데이터프레임(df_all)에서 type이 '같은' 항목들만 받아서 새로 데이터프레임을 만든다.
      df_type = df_all.loc[df_all['type'].isin(type_receive)]
