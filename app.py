@@ -36,9 +36,10 @@ from pymongo import MongoClient, ReturnDocument
 # 서버 db 사용시 로컬 db 주석 처리, 로컬 db 사용시 서버 db 주석 처리
 # **********************************************************
 
-# client = MongoClient('localhost', 27017)
-# client = MongoClient('mongodb://test:test@54.180.2.121', 27017) **구버전 DB(폐쇄)
-client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
+
+client = MongoClient('localhost', 27017)
+# client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
+
 
 db = client.dbchacha
 
@@ -470,4 +471,8 @@ def sign_page():
 
 # ***************************************************************************************************
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run('0.0.0.0', port=5000, debug=True)
+=======
+   app.run('0.0.0.0',port=5000,debug=True)
+>>>>>>> fd3abcaa2a6968616b995cbeeff1e2c5dbc6b02f
