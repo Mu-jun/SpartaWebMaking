@@ -41,7 +41,7 @@ from pymongo import MongoClient, ReturnDocument
 # **********************************************************
 
 client = MongoClient('localhost', 27017)
-# client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+# client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
 
 db = client.dbchacha
 
