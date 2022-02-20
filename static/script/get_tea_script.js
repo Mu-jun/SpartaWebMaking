@@ -111,11 +111,40 @@
             });
         }
 
-        async function get_access_token() {
-            let result = await fetch('/get_access_token');
-            let token = await result.text()
-            return token;
+        /* like+scrap 스크립트 */
+
+        /*
+        async function likeTea(name) {
+            let access_token = await get_access_token();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tea/like_all',
+                data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
+                success: function (response) {
+                    if(response['alreadyScrap']) {
+                        alert(response['alreadyScrap']);
+                        window.location.reload()
+                    }
+                    else if(response['successScrap']){
+                        alert(response['successScrap']);
+                        window.location.reload()
+                    }
+                }
+            });
         }
+
+         */
+
+        async function get_access_token() {
+    let result = await fetch('/get_access_token');
+    let token = '';
+
+    if(result.ok) token = await result.json();
+
+    return token;
+}
 
         async function scrapTea(name) {
             let access_token = await get_access_token();

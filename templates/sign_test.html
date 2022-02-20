@@ -35,7 +35,7 @@
             let result = await sign_checkID(id);
 
             if(result['success']) {
-                isPassibleID = True;
+                isPassibleID = true;
                 alert(result['success']);
                 $('#checkIDText').text('중복확인완료');
             } else alert(result['fail'])            
@@ -54,7 +54,7 @@
 
             let result = await sign_checkNickname(nickname);
             if(result['success']) {
-                isPassibleNickname = True;
+                isPassibleNickname = true;
                 alert(result['success']);
                 $('#checkNicknameText').text('중복확인완료');
             } else alert(result['fail']);      

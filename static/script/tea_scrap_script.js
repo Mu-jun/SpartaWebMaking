@@ -2,11 +2,14 @@
             showScrap();
         });
 
-        async function get_access_token() {
-            let result = await fetch('/get_access_token');
-            let token = await result.text()
-            return token;
-        }
+            async function get_access_token() {
+                let result = await fetch('/get_access_token');
+                let token = '';
+
+                if (result.ok) token = await result.json();
+
+                return token;
+            }
 
             async function showScrap() {
             let access_token = await get_access_token();
