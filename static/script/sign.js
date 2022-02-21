@@ -156,10 +156,10 @@ async function sign_Delete(password) {
 
     let response = await fetch('/sign/delete_user',{
         method: 'POST',
-        /*headers: {
+        headers: {
             'Content-Type': 'application/json;charset=utf-8',
             "Authorization": "Bearer "+ access_token
-        },*/
+        },
         body: JSON.stringify({'pass_give': password})
     }).then(result=>result.json());
     
@@ -171,10 +171,10 @@ async function sign_ChangePassword(currentPassword,newPassword) {
     let access_token = await get_access_token();
     let response = await fetch('/sign/change_pass',{
             method:"POST",
-            /*headers: {
+            headers: {
                 'Content-Type': 'application/json;charset=utf-8',
                 "Authorization": "Bearer "+ access_token
-            },*/
+            },
             body: JSON.stringify({
                 'pass_give': currentPassword,
                 'new_pass_give': newPassword                    
