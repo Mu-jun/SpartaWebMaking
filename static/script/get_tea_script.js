@@ -51,7 +51,9 @@
                 data: {},
                 success: function (response) {
                     $('#box').empty()
-                    let Tea = response['teas_name']
+                    let Tea = response['all_teas']
+                    Tea.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
+
                     for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
@@ -89,7 +91,9 @@
                 data: {},
                 success: function (response) {
                     $('#box').empty()
-                    let Tea = response['teas_like']
+                    let Tea = response['all_teas']
+                    Tea.sort((a, b) => b.like - a.like);
+
                     for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
@@ -122,8 +126,8 @@
 
         // 검색 기능
         function search(){
-            let count = 0;
-            let teaKeyword = $('#teaName').val();
+            let count = 0; // 검색된 차 개수
+            let teaKeyword = $('#teaName').val(); // 검색어
             $.ajax({
                 type: "POST",
                 url: "/tea/search",

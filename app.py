@@ -22,6 +22,7 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
 app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
 app.config['JWT_TOKEN_LOCATION'] = ["cookies"]
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -53,21 +54,21 @@ db = client.dbchacha
 def save_tea():
     print(request.is_json)
     tea_receive = request.get_json()
-    name_receive = tea_receive['name_give']  # 차 이름입니다
-    # eng_name_receive = tea_receive['eng_name_give']          # (영문)차 이름입니다 - 사용 않아서 주석처리
-    type_receive = tea_receive['type_give']  # 대분류1 종류
-    eng_type_receive = tea_receive['eng_type_give']  # 대분류1 (영문)종류 - 종류 선택시 자동 입력
-    benefit_receive = tea_receive['benefit_give']  # 대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
-    caffeine_receive = tea_receive['caffeine_give']  # 상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']  # 상세2 상세효능
-    desc_receive = tea_receive['desc_give']  # 상세2 상세설명
-    caution_receive = tea_receive['caution_give']  # 상세3 주의사항
-    img_receive = tea_receive['img_give']  # 상세4 이미지 주소
+    name_receive = tea_receive['name_give']                     # 차 이름입니다
+    eng_name_receive = tea_receive['eng_name_give']             # (영문)차 이름입니다 - 사용 않아서 주석처리
+    type_receive = tea_receive['type_give']                     # 대분류1 종류
+    eng_type_receive = tea_receive['eng_type_give']             # 대분류1 (영문)종류 - 종류 선택시 자동 입력
+    benefit_receive = tea_receive['benefit_give']               # 대분류2 효능
+    caffeineOX_receive = tea_receive['caffeineOX_give']         # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
+    caffeine_receive = tea_receive['caffeine_give']             # 상세1 카페인 "함량"
+    benefitdetail_receive = tea_receive['benefitdetail_give']   # 상세2 상세효능
+    desc_receive = tea_receive['desc_give']                     # 상세2 상세설명
+    caution_receive = tea_receive['caution_give']               # 상세3 주의사항
+    img_receive = tea_receive['img_give']                       # 상세4 이미지 주소
 
     doc = {
         'name': name_receive,
-        # 'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
+        'eng_name': eng_name_receive,
         'type': type_receive,
         'eng_type': eng_type_receive,
         'benefit': benefit_receive,
@@ -105,15 +106,22 @@ def read_mongo():
     # df_all : Pandas(패키지)로 데이터프레임 형태를 만들어, DB 전체를 불러온다.
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
     selector_receive = request.get_json()
+
+    print (selector_receive)
+
     type_receive = selector_receive['type_give']
     benefit_receive = selector_receive['benefit_give']
     caffeineOX_receive = selector_receive['caffeineOX_give']
 
-    print(type_receive)
-
     # df_type : 전체 데이터프레임(df_all)에서 type이 '같은' 항목들만 받아서 새로 데이터프레임을 만든다.
     df_type = df_all.loc[df_all['type'].isin(type_receive)]
     df_type.head()
+
+    # df_benefit = df_type.loc[df_type['benefit'].str.contains(benefit_receive)]
+    # df_benefit()
+    # 위와 같이 작성할 경우, TypeError: unhashable type: 'list' 라는 에러가 발생한다.
+    # 즉 .isin은 DataFrame 내에서 type 열을 선택하여, type_receive라는 list 내의 값들 중 한 가지를 갖는 행들을 알아서 비교하고 찾아주지만,
+    # .str.contains는 DataFrame 내의 benefit 열을 선택하여, "하나의 string"을 포함하는 행만을 찾아줄 수 있다.
 
     # benequery : 데이터프레임에서 어떤 조건으로 검색할지 query문을 만들어주기 위한 문자 함수이다.
     # 입력받는 효능의 갯수가 불확실한 상황에서, DB상의 "효능"란에 입력받은 값이 '포함' 되는지를 비교할 기능을 찾지 못했다.
@@ -158,9 +166,8 @@ def recommend_page():
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
-    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
-    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
+    random.shuffle(tea_List)  # 랜덤 정렬
+    return jsonify({'all_teas':tea_List})
 
 # 검색 기능 -- 영은
 @app.route('/tea/search', methods=['POST'])
@@ -283,6 +290,31 @@ def scrapPage():
 # ***************************************************************************************************
 # mu-jun's function code
 
+#get nickname
+@app.route('/sign/getNickname', methods=['GET'])
+@jwt_required()
+def getNickname():
+    print('getNickname start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})        
+    
+    return jsonify({'nickname':user['nickname']})
+    
+#check admin
+@app.route('/sign/checkAdmin', methods=['GET'])
+@jwt_required()
+def checkAdmin():
+    print('checkAdmin start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})
+        
+    if user['isAdmin']:
+        return jsonify({'check':True})
+    else:
+        return jsonify({'check':False})
+
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
@@ -295,7 +327,6 @@ def checkID():
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
         return jsonify({'success': '사용 가능한 ID입니다.'})
-
 
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
@@ -405,13 +436,12 @@ def api_get_access_token():
     else:
         return jsonify(None)
 
-
 @app.route('/get_refresh_token', methods=['GET'])
 def api_get_refresh_token():
     print('get_refresh_token start')
 
     result = request.cookies.get('chachaRefreshToken')
-    print(result)
+    
     if result is not None:
         return jsonify(result)
     else:
@@ -422,10 +452,13 @@ def api_get_refresh_token():
 @jwt_required(refresh=True)
 def refresh():
     print('refresh start')
-
+    response = make_response()
     current_user = get_jwt_identity()
+    
     access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
+    set_access_cookies(response,access_token)
+    
+    return response
 
 
 # sign information 유저정보변경
