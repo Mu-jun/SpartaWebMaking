@@ -125,17 +125,21 @@
 
         // 검색 기능
         function search(){
+            let count = 0;
+            let teaKeyword = $('#teaName').val();
             $.ajax({
-                type: "GET",
-                url: "/tea/list",
-                data: {},
+                type: "POST",
+                url: "/tea/search",
+                headers: {'Content-Type': 'application/json'},
+                dataType: 'json',
+                data: JSON.stringify({
+                    teaKeyword: teaKeyword,
+                }),
                 success: function (response) {
                     $('#box').empty()
-                    let teaKeyword = $('#teaName').val();
-                    let Tea = response['all_teas']
+                    let Tea = JSON.parse(response['search_teas'])
+                    for (let i = 0; i < Tea.length; i++){
 
-                    for(let i =0; i<Tea.length; i++){
-                        if(Tea[i]['name']==teaKeyword) {
                             let name = Tea[i]['name']
                             let type = Tea[i]['type']
                             let benefit = Tea[i]['benefit']
@@ -161,8 +165,11 @@
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
-                        }
-                }}
+                        count++;
+                }
+                    let count_html =`<p>${count}개 찾았습니다</p>`
+                    $('#box').append(count_html)
+                }
             })
         }
 
