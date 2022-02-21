@@ -151,15 +151,33 @@ def recommend_page():
 # ***************************************************************************************************
 
 
-# 티 정보 GET 하기 -- 영은
+
 
 # ***************************************************************************************************
+
+# 티 정보 GET 하기 -- 영은
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
     sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
     sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
     return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
+
+# 검색 기능 -- 영은
+@app.route('/tea/search', methods=['POST'])
+def searchTea():
+    df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
+
+    keyword_receive = request.get_json()['teaKeyword']
+    print(keyword_receive)
+
+    df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    print(df_search)
+
+    find_list = df_search.to_json(orient='records', force_ascii=False)
+    print(find_list)
+
+    return jsonify({'search_teas': find_list})
 
 
 @app.route('/tea')
@@ -197,7 +215,7 @@ def scrapTea():
     check_scrap_name = db.scraps.find_one({'name': name_receive})
     check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
-    if check_scrap_name and check_scrap_id is not None:
+    if check_scrap_id == current_user:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
@@ -475,4 +493,8 @@ def sign_page():
 
 # ***************************************************************************************************
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run('0.0.0.0', port=5000, debug=True)
+=======
+    app.run('0.0.0.0',port=5000,debug=True)
+>>>>>>> d02ebff5bea7f902fdbfc6e055552bbacb647fbe
