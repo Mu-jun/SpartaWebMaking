@@ -21,7 +21,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
 app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
-# app.config['JWT_TOKEN_LOCATION'] = ["cookies","headers"]
+app.config['JWT_TOKEN_LOCATION'] = ["cookies"]
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -150,13 +150,33 @@ def recommend_page():
 # ***************************************************************************************************
 
 
-# 티 정보 GET 하기 -- 영은
+
 
 # ***************************************************************************************************
+
+# 티 정보 GET 하기 -- 영은
 @app.route('/tea/list', methods=['GET'])
 def getTea():
-    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    return jsonify({'all_teas': tea_list})
+    tea_List = list(db.tealist.find({}, {'_id': False}))
+    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
+    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
+
+# 검색 기능 -- 영은
+@app.route('/tea/search', methods=['POST'])
+def searchTea():
+    df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
+
+    keyword_receive = request.get_json()['teaKeyword']
+    print(keyword_receive)
+
+    df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    print(df_search)
+
+    find_list = df_search.to_json(orient='records', force_ascii=False)
+    print(find_list)
+
+    return jsonify({'search_teas': find_list})
 
 
 @app.route('/tea')
@@ -350,10 +370,11 @@ def api_signin():
             response = jsonify({'success': '환영합니다.' + user['nickname'] + '님'})
 
             access_token = create_access_token(identity=user['id'])
-            response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True)
-
+            #response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True)
+            set_access_cookies(response,access_token)
             refresh_token = create_refresh_token(identity=user['id'])
-            response.set_cookie('chachaRefreshToken', value=refresh_token, samesite=None, httponly=True)
+            #response.set_cookie('chachaRefreshToken', value=refresh_token, samesite=None, httponly=True)
+            set_refresh_cookies(response,refresh_token)
 
             return response
     else:
@@ -471,6 +492,4 @@ def sign_page():
 
 # ***************************************************************************************************
 if __name__ == '__main__':
-
-   app.run('0.0.0.0',port=5000,debug=True)
-
+    app.run('0.0.0.0',port=5000,debug=True)
