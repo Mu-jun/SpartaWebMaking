@@ -1,3 +1,4 @@
+import random
 from urllib import response
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
@@ -190,45 +191,6 @@ def searchTea():
 def teaList():
     return render_template('get_tea.html')
 
-"""
-# ***************************************************************************************************
-
-# like --승신
-# ***************************************************************************************************
-@app.route('/tea/like', methods=['POST'])
-@jwt_required()
-def likeTea():
-    name_receive = request.form['name_give']
-    target_tea = db.tealist.find_one({'name': name_receive})
-    current_like = target_tea['like']
-
-    new_like = current_like + 1
-
-    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-    return jsonify({'msg': 'like +1'})
-
-
-# ***************************************************************************************************
-
-# scrap --승신
-# 찜 오류 해결 (해결하고나서 보니 매우 간단하게 해결 가능했다는 점이 빡침 포인트)
-# ***************************************************************************************************
-@app.route('/tea/scrap', methods=['POST'])
-@jwt_required()
-def scrapTea():
-    current_user = get_jwt_identity().upper()
-    name_receive = request.form['name_give']
-    check_scrap_name = db.scraps.find_one({'name': name_receive})
-    check_scrap_id = db.scraps.find_one({'user_id': current_user})
-
-    if check_scrap_id == current_user:
-        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
-    else:
-        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
-        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
-        db.scraps.insert_one(scrap_list)
-        return jsonify({'successScrap': '찜 완료 되었습니다.'})
-"""
 
 # ***************************************************************************************************
 
@@ -243,20 +205,19 @@ def like_all():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
     current_like = target_tea['like']
-    check_scrap_name = db.scraps.find_one({'name': name_receive})
-    check_scrap_id = db.scraps.find_one({'user_id': current_user})
+    check_scrap_id = db.users.find_one({'user_id': current_user})['scrap_id']
 
 
-    if check_scrap_name and check_scrap_id is not None:
+    if check_scrap_id is not None:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         new_like = current_like + 1
         db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
-        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
-        db.scraps.insert_one(scrap_list)
-        return jsonify({'successScrap': '찜 완료 되었습니다.'})
-
+        scrap_id = db.tealist.find_one({'name': name_receive})
+        id_list = []
+        id_list.append(scrap_id)
+        db.users.update_one({'id': current_user}, {'$set': {'scrap_id': id_list}}, True)
+        return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
 # ***************************************************************************************************
 
@@ -264,10 +225,13 @@ def like_all():
 @jwt_required()
 def showScrapTea():
     current_user = get_jwt_identity().upper()
-    my_scrap_list = db.scraps.find_one({'user_id': current_user})
-    if my_scrap_list is not None:
-        scrap_list = list(db.scraps.find({'user_id': current_user}, {'_id': False}).sort("name"))
-        return jsonify({'scrapTeas': scrap_list})
+    check_id_list = db.users.find_one({'user_id': current_user})
+    if check_id_list is not None:
+        scrap_list = list(db.users.find({'id': '123'}))
+        a = scrap_list[0]['scrap_id']
+        for i in a:
+            b = list(db.tealist.find({'_id': i}))
+        return jsonify({'scrapTeas': b})
     else:
         return jsonify({'msg': '비어있습니다'})
 
@@ -526,3 +490,45 @@ def sign_page():
 # ***************************************************************************************************
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000,debug=True)
+
+# 안 쓰는데 혹시나 해서 남겨둔 예전 like & scrap *********************************************************
+
+"""
+# ***************************************************************************************************
+
+# like --승신
+# ***************************************************************************************************
+@app.route('/tea/like', methods=['POST'])
+@jwt_required()
+def likeTea():
+    name_receive = request.form['name_give']
+    target_tea = db.tealist.find_one({'name': name_receive})
+    current_like = target_tea['like']
+
+    new_like = current_like + 1
+
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    return jsonify({'msg': 'like +1'})
+
+
+# ***************************************************************************************************
+
+# scrap --승신
+# 찜 오류 해결 (해결하고나서 보니 매우 간단하게 해결 가능했다는 점이 빡침 포인트)
+# ***************************************************************************************************
+@app.route('/tea/scrap', methods=['POST'])
+@jwt_required()
+def scrapTea():
+    current_user = get_jwt_identity().upper()
+    name_receive = request.form['name_give']
+    check_scrap_name = db.scraps.find_one({'name': name_receive})
+    check_scrap_id = db.scraps.find_one({'user_id': current_user})
+
+    if check_scrap_id == current_user:
+        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
+    else:
+        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
+        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
+        db.scraps.insert_one(scrap_list)
+        return jsonify({'successScrap': '찜 완료 되었습니다.'})
+"""

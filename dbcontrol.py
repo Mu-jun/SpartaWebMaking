@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-client = MongoClient('mongodb://test:test@54.180.2.121', 27017)
+client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
 db = client.dbchacha
 
 # # 저장 - 예시
@@ -18,8 +18,25 @@ db = client.dbchacha
 
 # db.tealist.update_one({'name':'커피'},{'$set':{'benefit':'피로회복 힐링힐링'}})
 # db.tealist.update_one({'name':'결명자차'},{'$set':{'like':0}})
+"""
+scrap_id1 = db.tealist.find_one({'name': '세작'})
+scrap_id2 = db.tealist.find_one({'name': '대작'})
+id_list = []
+id_list.append(scrap_id1['_id'])
+id_list.append(scrap_id2['_id'])
 
-
+print(id_list)
+db.users.update_one({'id': "123"}, {'$set': {'scrap_id': id_list}}, True)
+"""
+"""
+scrap_list = list(db.users.find({'id': '123'}))
+a = scrap_list[0]['scrap_id']
+for i in a:
+   b = list(db.tealist.find({'_id':i}))
+   print(b)
+"""
+check_scrap_id = db.users.find_one({'id': '123'})['scrap_id']
+print(check_scrap_id)
 
 
 # # 지우기 - 예시
