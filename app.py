@@ -194,7 +194,7 @@ def scrapTea():
     check_scrap_name = db.scraps.find_one({'name': name_receive})
     check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
-    if check_scrap_name and check_scrap_id is not None:
+    if check_scrap_id == current_user:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
