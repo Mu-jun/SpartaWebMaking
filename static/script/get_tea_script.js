@@ -53,6 +53,8 @@
                 success: function (response) {
                     $('#box').empty()
                     let Tea = response['all_teas']
+                    Tea.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);
+
                     for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
@@ -92,7 +94,8 @@
                 success: function (response) {
                     $('#box').empty()
                     let Tea = response['all_teas']
-                    Tea.sort()
+                    Tea.sort((a, b) => b.like - a.like);
+
                     for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
