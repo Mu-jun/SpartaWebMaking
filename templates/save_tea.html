@@ -81,13 +81,13 @@
                    aria-describedby="inputGroup-sizing-default">
         </div>
 
-        <div class="input-group mb-3">
+        <!-- <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="inputGroup-sizing-default">차 영문명</span>
             </div>
             <input type="text" id="eng_name" class="form-control" aria-label="Default"
                    aria-describedby="inputGroup-sizing-default">
-        </div>
+        </div> -->
 
         <div class="smalltitle"><h5>대분류 3가지</h5></div>
 
@@ -215,7 +215,7 @@ function save_tea() {
         }
 
         let name = $('#name').val()                         /* 차이름 */
-        let eng_name = $('#eng_name').val()                 /* 영문명 */
+        /* let eng_name = $('#eng_name').val()                 영문명 */
         let benefit = result                                /* 효능 */
         let caffeine = $('#caffeine').val()                 /* 카페인함유량 */
         var caffeineOX = Boolean(caffeine)                  /* 카페인함유여부 */
@@ -231,7 +231,7 @@ function save_tea() {
             dataType: 'json',
             data: JSON.stringify({
                 name_give: name,
-                eng_name_give: eng_name,
+                /* eng_name_give: eng_name, */
                 type_give: type,
                 eng_type_give: eng_type,
                 benefit_give: benefit,

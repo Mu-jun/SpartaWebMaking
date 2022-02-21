@@ -56,7 +56,7 @@ def save_tea():
     print(request.is_json)
     tea_receive = request.get_json()
     name_receive = tea_receive['name_give']                     # 차 이름입니다
-    eng_name_receive = tea_receive['eng_name_give']             # (영문)차 이름입니다 - 사용 않아서 주석처리
+    # eng_name_receive = tea_receive['eng_name_give']             # (영문)차 이름입니다 - 사용 않아서 주석처리
     type_receive = tea_receive['type_give']                     # 대분류1 종류
     eng_type_receive = tea_receive['eng_type_give']             # 대분류1 (영문)종류 - 종류 선택시 자동 입력
     benefit_receive = tea_receive['benefit_give']               # 대분류2 효능
@@ -69,7 +69,7 @@ def save_tea():
 
     doc = {
         'name': name_receive,
-        'eng_name': eng_name_receive,
+         # 'eng_name': eng_name_receive,
         'type': type_receive,
         'eng_type': eng_type_receive,
         'benefit': benefit_receive,
@@ -107,9 +107,6 @@ def read_mongo():
     # df_all : Pandas(패키지)로 데이터프레임 형태를 만들어, DB 전체를 불러온다.
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
     selector_receive = request.get_json()
-
-    print (selector_receive)
-
     type_receive = selector_receive['type_give']
     benefit_receive = selector_receive['benefit_give']
     caffeineOX_receive = selector_receive['caffeineOX_give']
@@ -118,17 +115,11 @@ def read_mongo():
     df_type = df_all.loc[df_all['type'].isin(type_receive)]
     df_type.head()
 
-    # df_benefit = df_type.loc[df_type['benefit'].str.contains(benefit_receive)]
-    # df_benefit()
-    # 위와 같이 작성할 경우, TypeError: unhashable type: 'list' 라는 에러가 발생한다.
-    # 즉 .isin은 DataFrame 내에서 type 열을 선택하여, type_receive라는 list 내의 값들 중 한 가지를 갖는 행들을 알아서 비교하고 찾아주지만,
-    # .str.contains는 DataFrame 내의 benefit 열을 선택하여, "하나의 string"을 포함하는 행만을 찾아줄 수 있다.
-
+    # df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
     # benequery : 데이터프레임에서 어떤 조건으로 검색할지 query문을 만들어주기 위한 문자 함수이다.
     # 입력받는 효능의 갯수가 불확실한 상황에서, DB상의 "효능"란에 입력받은 값이 '포함' 되는지를 비교할 기능을 찾지 못했다.
     # 우리가 입력받은 효능 값의 개수만큼 for 문을 돌려서 아래와 같이 query 문을 만들었다.
     # 예시: (@df_type['benefit'].str.contains ('다이어트')) or (@df_type['benefit'].str.contains('피부미용'))
-
     benequery = f"(@df_type['benefit'].str.contains ('"
     for i in range(len(benefit_receive)):
         if i < len(benefit_receive) - 1:
@@ -136,8 +127,6 @@ def read_mongo():
         else:
             benequery += benefit_receive[i] + f"'))"
     print(benequery)
-
-    # df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
     df_benefit = df_type.query(benequery)
     df_benefit.head()
 
@@ -150,11 +139,9 @@ def read_mongo():
 
     return jsonify({'find_teas': find_list})
 
-
 @app.route('/recommend')  # 검색창 부분 건드리지 않으려고 우선 따로 만들어봄, 병합시 삭제 또는 수정
 def recommend_page():
     return render_template('recommend_tea.html')
-
 
 # ***************************************************************************************************
 
