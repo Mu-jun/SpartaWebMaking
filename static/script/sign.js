@@ -35,7 +35,7 @@ async function sign_signup(id,password,nickname) {
             'nickname_give': nickname
         })
     }).then(result=>{
-        console.log(result);
+        //console.log(result);
         if(result.ok) return result.json();
         else return null;
     });
@@ -86,31 +86,25 @@ async function get_refresh_token() {
     let token = '';
 
     if(result.ok) token = await result.json();
-    console.log(token);
+    //console.log(token);
     return token;
 }
 
-function refreshing(refresh_token) {
-    $.ajax({
-        type: "GET",
-        url: "/refresh",
-        headers: {"Authorization": "Bearer "+ refresh_token},
-        success: function(response){
-            console.log(response.json())           
-        }
-    })
+function refreshing() {
+    //console.log("리프레싱 시작")
+    fetch("/refresh");    
 }
 
 function get_payload(token) {
 
-    console.log(token)
+    //console.log(token)
 
     let payload = '';
     if(token){
         let base64Payload = token.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE
         payload = atob(base64Payload);
         
-        console.log(payload);
+        //console.log(payload);
     }
     return payload;
 }
@@ -118,7 +112,7 @@ function get_payload(token) {
 function get_payload_exp(token) {
 
     let exp = get_payload(token).split("exp")[1].slice(2,12);
-    console.log(exp);
+    //console.log(exp);
 
     return +exp;
 }
@@ -149,8 +143,16 @@ async function sign_checkSign() {
     return isSign;
 }
 
-// sign information change
-async function sign_Delete(password) {
+// sign information
+async function sign_getNickname() {
+    let nickname = await fetch('/sign/getNickname')
+        .then(result=>result.json())
+        .then(result=>result['nickname'])
+
+    return nickname
+}
+
+async function sign_delete(password) {
     await sign_checkSign();
     //let access_token = await get_access_token();
 
@@ -166,7 +168,7 @@ async function sign_Delete(password) {
     return response;
 }
 
-async function sign_ChangePassword(currentPassword,newPassword) {
+async function sign_changePassword(currentPassword,newPassword) {
     await sign_checkSign();   
     //let access_token = await get_access_token();
     let response = await fetch('/sign/change_pass',{
@@ -182,4 +184,13 @@ async function sign_ChangePassword(currentPassword,newPassword) {
         }).then(result=>result.json());
 
     return response;    
+}
+
+//Check Admin
+async function sign_checkAdmin() {
+    let isAdmin = await fetch('sign/checkAdmin')
+        .then(result=>result.json());
+    console.log(typeof isAdmin['check'])
+
+    return isAdmin['check']
 }

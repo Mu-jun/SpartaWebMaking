@@ -7,7 +7,6 @@ from hashlib import *
 import datetime
 import chachaconfig
 import pandas as pd
-import random
 import json
 
 app = Flask(__name__)
@@ -176,10 +175,13 @@ def searchTea():
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
 
     keyword_receive = request.get_json()['teaKeyword']
+    print(keyword_receive)
 
     df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    print(df_search)
 
     find_list = df_search.to_json(orient='records', force_ascii=False)
+    print(find_list)
 
     return jsonify({'search_teas': find_list})
 
@@ -288,6 +290,31 @@ def scrapPage():
 # ***************************************************************************************************
 # mu-jun's function code
 
+#get nickname
+@app.route('/sign/getNickname', methods=['GET'])
+@jwt_required()
+def getNickname():
+    print('getNickname start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})        
+    
+    return jsonify({'nickname':user['nickname']})
+    
+#check admin
+@app.route('/sign/checkAdmin', methods=['GET'])
+@jwt_required()
+def checkAdmin():
+    print('checkAdmin start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})
+        
+    if user['isAdmin']:
+        return jsonify({'check':True})
+    else:
+        return jsonify({'check':False})
+
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
@@ -300,7 +327,6 @@ def checkID():
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
         return jsonify({'success': '사용 가능한 ID입니다.'})
-
 
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
@@ -410,13 +436,12 @@ def api_get_access_token():
     else:
         return jsonify(None)
 
-
 @app.route('/get_refresh_token', methods=['GET'])
 def api_get_refresh_token():
     print('get_refresh_token start')
 
     result = request.cookies.get('chachaRefreshToken')
-    print(result)
+    
     if result is not None:
         return jsonify(result)
     else:
@@ -427,10 +452,13 @@ def api_get_refresh_token():
 @jwt_required(refresh=True)
 def refresh():
     print('refresh start')
-
+    response = make_response()
     current_user = get_jwt_identity()
+    
     access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
+    set_access_cookies(response,access_token)
+    
+    return response
 
 
 # sign information 유저정보변경
