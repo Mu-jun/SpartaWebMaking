@@ -7,7 +7,6 @@ from hashlib import *
 import datetime
 import chachaconfig
 import pandas as pd
-import random
 import json
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 현상 해결코드
 # api = Api(app)
 
 app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(seconds=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
 app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
@@ -160,9 +159,8 @@ def recommend_page():
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
-    random.shuffle(tea_List)  # 랜덤 정렬
-    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))  # 이름순 정렬
-    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))  # 추천순 정렬
+    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
     return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
 
 # 검색 기능 -- 영은
@@ -171,10 +169,13 @@ def searchTea():
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
 
     keyword_receive = request.get_json()['teaKeyword']
+    print(keyword_receive)
 
     df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    print(df_search)
 
     find_list = df_search.to_json(orient='records', force_ascii=False)
+    print(find_list)
 
     return jsonify({'search_teas': find_list})
 
@@ -405,7 +406,6 @@ def api_get_access_token():
     else:
         return jsonify(None)
 
-
 @app.route('/get_refresh_token', methods=['GET'])
 def api_get_refresh_token():
     print('get_refresh_token start')
@@ -422,10 +422,13 @@ def api_get_refresh_token():
 @jwt_required(refresh=True)
 def refresh():
     print('refresh start')
-
+    response = make_response()
     current_user = get_jwt_identity()
+    
     access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
+    set_access_cookies(response,access_token)
+    
+    return response
 
 
 # sign information 유저정보변경
