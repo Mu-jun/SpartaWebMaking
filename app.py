@@ -161,9 +161,7 @@ def recommend_page():
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
     random.shuffle(tea_List)  # 랜덤 정렬
-    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))  # 이름순 정렬
-    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))  # 추천순 정렬
-    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
+    return jsonify({'all_teas':tea_List})
 
 # 검색 기능 -- 영은
 @app.route('/tea/search', methods=['POST'])
