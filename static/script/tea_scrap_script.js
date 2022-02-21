@@ -50,7 +50,7 @@
                     }
                         else if(response['msg']){
                             alert(response['msg'])
-                            let url_teaList = 'http://localhost:5000/tea'
+                            let url_teaList = 'http://13.124.112.143/tea'
                             window.location.replace(url_teaList);
 
                         }
