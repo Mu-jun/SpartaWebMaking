@@ -35,7 +35,6 @@
                                          <p>${caffeine}</p>
                                          <p>${caution}</p>
                                          <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
-                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
@@ -75,7 +74,6 @@
                                          <p>${caffeine}</p>
                                          <p>${caution}</p>
                                          <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
-                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
@@ -114,7 +112,6 @@
                                          <p>${caffeine}</p>
                                          <p>${caution}</p>
                                          <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
-                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
@@ -161,7 +158,6 @@
                                          <p>${caffeine}</p>
                                          <p>${caution}</p>
                                          <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button> 좋아요 수 : ${like}</p>
-                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
@@ -182,24 +178,8 @@
 
         /* 찜 좋아요 기능 스크립트 --승신 */
 
-        async function likeTea(name) {
-            let access_token = await get_access_token();
-
-            $.ajax({
-                type: 'POST',
-                url: '/tea/like',
-                data: {name_give: name},
-                headers: {"Authorization": "Bearer "+ access_token},
-                success: function (response) {
-                    alert(response['msg']);
-                    window.location.reload()
-                }
-            });
-        }
-
         /* like+scrap 스크립트 */
 
-        /*
         async function likeTea(name) {
             let access_token = await get_access_token();
 
@@ -221,8 +201,6 @@
             });
         }
 
-         */
-
         async function get_access_token() {
     let result = await fetch('/get_access_token');
     let token = '';
@@ -231,7 +209,7 @@
 
     return token;
 }
-
+/*
         async function scrapTea(name) {
             let access_token = await get_access_token();
 
@@ -252,3 +230,20 @@
                 }
             });
         }
+*/
+/*
+                async function likeTea(name) {
+            let access_token = await get_access_token();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tea/like',
+                data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
+                success: function (response) {
+                    alert(response['msg']);
+                    window.location.reload()
+                }
+            });
+        }
+ */

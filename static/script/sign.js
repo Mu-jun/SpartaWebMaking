@@ -136,11 +136,11 @@ async function sign_checkSign() {
         if(access_payload_exp > numberic_date) {
             isSign = true;
         } else {
-            let refresh_token = await get_access_token();                        
+            let refresh_token = await get_refresh_token();
             let refresh_payload_exp = get_payload_exp(refresh_token);            
 
             if(refresh_payload_exp > numberic_date) {
-                refresh();
+                refreshing();
                 isSign = true;
             }
             
@@ -152,13 +152,13 @@ async function sign_checkSign() {
 // sign information change
 async function sign_Delete(password) {
     await sign_checkSign();
-    let access_token = await get_access_token();
+    // let access_token = await get_access_token();
 
     let response = await fetch('/sign/delete_user',{
         method: 'POST',
         headers: {
             'Content-Type': 'application/json;charset=utf-8',
-            "Authorization": "Bearer "+ access_token
+           // "Authorization": "Bearer "+ access_token
         },
         body: JSON.stringify({'pass_give': password})
     }).then(result=>result.json());

@@ -183,7 +183,7 @@ def searchTea():
 def teaList():
     return render_template('get_tea.html')
 
-
+"""
 # ***************************************************************************************************
 
 # like --승신
@@ -221,7 +221,7 @@ def scrapTea():
         scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
         db.scraps.insert_one(scrap_list)
         return jsonify({'successScrap': '찜 완료 되었습니다.'})
-
+"""
 
 # ***************************************************************************************************
 
@@ -311,7 +311,7 @@ def checkNickname():
         return jsonify({'success': '사용 가능한 별명입니다.'})
 
 
-# 반복 솔팅?
+# 반복 솔팅
 def hash_pass(password, id):
     personal_key = id[:8].encode('utf-8')
     password = password + chachaconfig.salt_key
@@ -370,10 +370,10 @@ def api_signin():
             response = jsonify({'success': '환영합니다.' + user['nickname'] + '님'})
 
             access_token = create_access_token(identity=user['id'])
-            #response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True)
+            #response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True) 구시대의 유물
             set_access_cookies(response,access_token)
             refresh_token = create_refresh_token(identity=user['id'])
-            #response.set_cookie('chachaRefreshToken', value=refresh_token, samesite=None, httponly=True)
+            #response.set_cookie('chachaRefreshToken', value=refresh_token, samesite=None, httponly=True) 헤더 나가~
             set_refresh_cookies(response,refresh_token)
 
             return response
@@ -393,7 +393,7 @@ def set_access_token():
 
     return response
 
-
+# 곧 사라질 녀석들
 @app.route('/get_access_token', methods=['GET'])
 def api_get_access_token():
     print('get_access_token start')
@@ -416,7 +416,7 @@ def api_get_refresh_token():
         return jsonify(result)
     else:
         return jsonify(None)
-
+# 안녕..
 
 @app.route('/refresh', methods=['GET'])
 @jwt_required(refresh=True)
