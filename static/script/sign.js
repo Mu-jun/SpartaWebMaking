@@ -151,7 +151,7 @@ async function sign_checkSign() {
 
 // sign information change
 async function sign_Delete(password) {
-    await check_token();
+    await sign_checkSign();
     let access_token = await get_access_token();
 
     let response = await fetch('/sign/delete_user',{
@@ -167,7 +167,7 @@ async function sign_Delete(password) {
 }
 
 async function sign_ChangePassword(currentPassword,newPassword) {
-    await check_token();   
+    await sign_checkSign();   
     let access_token = await get_access_token();
     let response = await fetch('/sign/change_pass',{
             method:"POST",
