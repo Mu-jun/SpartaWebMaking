@@ -167,19 +167,29 @@ def recommend_page():
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
-    random.shuffle(tea_List)  # 랜덤 정렬
+    # db에서 list 형식으로 정보를 받아 옵니다.
+
+    random.shuffle(tea_List)
+    # 랜덤 정렬
+    # 페이지를 새로고침할때 마다 랜덤으로 정렬되도록 해주는 함수 입니다.
+
     return jsonify({'all_teas':tea_List})
 
 # 검색 기능 -- 영은
 @app.route('/tea/search', methods=['POST'])
 def searchTea():
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
+    # db에서 가져온 정보를 dataframe 형식으로 변환해줍니다
+    # pandas 모듈을 이용해 데이터를 추출하기 위함
 
     keyword_receive = request.get_json()['teaKeyword']
+    # ajax로 입력한 검색어를 받아옵니다
 
     df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    # 검색어가 포함된 데이터를 추출합니다.
 
     find_list = df_search.to_json(orient='records', force_ascii=False)
+    #json 형식으로 변환합니다
 
     return jsonify({'search_teas': find_list})
 
