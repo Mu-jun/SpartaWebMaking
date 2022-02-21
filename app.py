@@ -155,8 +155,10 @@ def recommend_page():
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
-    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    return jsonify({'all_teas': tea_list})
+    tea_List = list(db.tealist.find({}, {'_id': False}))
+    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
+    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
 
 
 @app.route('/tea')
