@@ -22,6 +22,7 @@ app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
 app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
 app.config['JWT_TOKEN_LOCATION'] = ["cookies"]
+app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['SESSION_COOKIE_SECURE'] = True
@@ -474,10 +475,4 @@ def sign_page():
 
 # ***************************************************************************************************
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run('0.0.0.0', port=5000, debug=True)
-=======
-
-   app.run('0.0.0.0',port=5000,debug=True)
-
->>>>>>> d6433983a6e96c6e75a15cafc25b783710121100
