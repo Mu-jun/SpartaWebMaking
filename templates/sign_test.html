@@ -144,7 +144,7 @@
                 let current_pass = $('#current_pass').val();
                 let new_pass = $('#new_pass').val();
 
-                let response = await sign_ChangePassword(current_pass,new_pass);
+                let response = await sign_changePassword(current_pass,new_pass);
                 
                 if(response['success']) {
                     alert(response['success']);
@@ -164,7 +164,7 @@
             let password = $('#user_pass').val();
             console.log(password)
 
-            let response = await sign_Delete(password);
+            let response = await sign_delete(password);
             console.log(response)
 
             if(response['success']) {
@@ -172,6 +172,13 @@
                 signout_mode();
             }
             else if (response['fail']) alert(response['fail']);            
+        }
+    //  관리자 확인
+        let isAdmin = false;
+        
+        async function checkAdmin() {
+            isAdmin = await sign_checkAdmin();
+            alert(isAdmin);
         }
 
     </script>
@@ -217,6 +224,11 @@
         <p>PW: <input type="password" id="user_pass"/></p>
         
         <button type="button" onclick="test_delete_user();">탈퇴하기</button>
+    </div>
+    <div>
+        <h1>관리자 확인 페이지</h1>
+               
+        <button type="button" onclick="checkAdmin();">확인하기</button>
     </div>
 </div>
 </body>

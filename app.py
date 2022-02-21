@@ -17,7 +17,7 @@ app.config['JSON_AS_ASCII'] = False  # 한글 깨짐 현상 해결코드
 # api = Api(app)
 
 app.config['JWT_SECRET_KEY'] = chachaconfig.jwt_key
-app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(seconds=5)
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=5)
 app.config['JWT_REFRESH_TOKEN_EXPIRES'] = datetime.timedelta(days=10)
 app.config['JWT_ACCESS_COOKIE_NAME'] = 'chachaAccessToken'
 app.config['JWT_REFRESH_COOKIE_NAME'] = 'chachaRefreshToken'
@@ -284,6 +284,31 @@ def scrapPage():
 # ***************************************************************************************************
 # mu-jun's function code
 
+#get nickname
+@app.route('/sign/getNickname', methods=['GET'])
+@jwt_required()
+def getNickname():
+    print('getNickname start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})        
+    
+    return jsonify({'nickname':user['nickname']})
+    
+#check admin
+@app.route('/sign/checkAdmin', methods=['GET'])
+@jwt_required()
+def checkAdmin():
+    print('checkAdmin start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})
+        
+    if user['isAdmin']:
+        return jsonify({'check':True})
+    else:
+        return jsonify({'check':False})
+
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
@@ -296,7 +321,6 @@ def checkID():
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
         return jsonify({'success': '사용 가능한 ID입니다.'})
-
 
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
@@ -411,7 +435,7 @@ def api_get_refresh_token():
     print('get_refresh_token start')
 
     result = request.cookies.get('chachaRefreshToken')
-    print(result)
+    
     if result is not None:
         return jsonify(result)
     else:
