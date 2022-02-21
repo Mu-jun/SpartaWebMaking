@@ -32,7 +32,293 @@
     <title>차 정보 가져오기</title>
 
     <link rel="stylesheet" href="../static/style_get.css" />
-    <script src="../static/script/get_tea_script.js"></script>
+    <script>
+
+        // **영은 담당 -- 이상한 거 있으면 연락주세요 !!
+
+        $(document).ready(function () {
+            showTea();
+        });
+
+        // 차 정보 보이게 하기 
+        // **확정** 
+        function showTea() {
+            $.ajax({
+                type: "GET",
+                url: "/tea/list",
+                data: {},
+                success: function (response) {
+                    let Tea = response['all_teas']
+                    for(let i =0; i<Tea.length; i++){
+                        let name = Tea[i]['name']
+                        let type = Tea[i]['type']
+                        let benefit = Tea[i]['benefit']
+                        let caffeineOX = Tea[i]['caffeineOX']
+                        let caffeine = Tea[i]['caffeine']
+                        let benefitdetail = Tea[i]['benefitdetail']
+                        let desc = Tea[i]['desc']
+                        let caution = Tea[i]['caution']
+                        let img = Tea[i]['img']
+                        let like = Tea[i]['like']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        // 이름순 정렬 -- 버튼 누르면 실행 
+        // **확정** 
+        function sortName() {
+            $.ajax({
+                type: "GET",
+                url: "/tea/list",
+                data: {},
+                success: function (response) {
+                    $('#box').empty()
+                    let Tea = response['all_teas'] 
+                    Tea.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1);  
+
+                    for(let i =0; i<Tea.length; i++){
+                        let name = Tea[i]['name']
+                        let type = Tea[i]['type']
+                        let benefit = Tea[i]['benefit']
+                        let caffeineOX = Tea[i]['caffeineOX']
+                        let caffeine = Tea[i]['caffeine']
+                        let benefitdetail = Tea[i]['benefitdetail']
+                        let desc = Tea[i]['desc']
+                        let caution = Tea[i]['caution']
+                        let img = Tea[i]['img']
+                        let like = Tea[i]['like']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        // 좋아요순 정렬 -- 버튼 누르면 실행 
+        // **확정** 수정사항 없음
+        function sortLike() {
+            $.ajax({
+                type: "GET",
+                url: "/tea/list",
+                data: {},
+                success: function (response) {
+                    $('#box').empty()
+                    let Tea = response['all_teas']
+                    Tea.sort((a, b) => b.like - a.like);
+
+                    for(let i =0; i<Tea.length; i++){
+                        let name = Tea[i]['name']
+                        let type = Tea[i]['type']
+                        let benefit = Tea[i]['benefit']
+                        let caffeineOX = Tea[i]['caffeineOX']
+                        let caffeine = Tea[i]['caffeine']
+                        let benefitdetail = Tea[i]['benefitdetail']
+                        let desc = Tea[i]['desc']
+                        let caution = Tea[i]['caution']
+                        let img = Tea[i]['img']
+                        let like = Tea[i]['like']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button>좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html)
+                    }
+                }
+            })
+        }
+
+        // 검색 기능
+        // **확정
+        function search(){
+            let count = 0; // 검색된 차 개수를 담을 변수
+            let teaKeyword = $('#teaName').val(); // 입력한 검색어 담기
+
+            $.ajax({
+                type: "POST",
+                url: "/tea/search",
+                headers: {'Content-Type': 'application/json'},
+                dataType: 'json',
+                data: JSON.stringify({
+                    teaKeyword: teaKeyword, // 서버로 검색어 보내기
+                }),
+                success: function (response) {
+                    $('#box').empty()
+                    let Tea = JSON.parse(response['search_teas']) // 서버에서 검색한 결과 값 json형식으로 받아옴
+
+                    for (let i = 0; i < Tea.length; i++){
+
+                            let name = Tea[i]['name']
+                            let type = Tea[i]['type']
+                            let benefit = Tea[i]['benefit']
+                            let caffeineOX = Tea[i]['caffeineOX']
+                            let caffeine = Tea[i]['caffeine']
+                            let benefitdetail = Tea[i]['benefitdetail']
+                            let desc = Tea[i]['desc']
+                            let caution = Tea[i]['caution']
+                            let img = Tea[i]['img']
+                            let like = Tea[i]['like']
+
+                        let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button> 좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+                        $('#box').append(temp_html) // 차 정보 출력
+                        count++; // 실행될 때마다 검색된 차의 개수 1씩 증가 시키기
+                }
+                    let count_html =`<p>${count}개 찾았습니다</p>` // 검색된 결과 개수 출력
+                    $('#box').append(count_html) 
+                }
+            })
+        }
+
+
+        // 검색어를 입력하고 "엔터키"를 쳐도 검색이 가능하도록 해주는 함수입니다 -- 원래는 찾기 버튼을 눌러야만 검색됨
+        // **확정
+        function enter() {
+            if (window.event.keyCode == 13) {
+                search();
+            }
+        }
+        // *참고
+        // 1. 아래 찾기 버튼 코드를 참고하면 버튼 태그에 href="javascript:enter();" 이 코드가 있어야 실행됩니다.
+        // <button onclick="search()" class="btn btn-outline-secondary" type="button" id="btn_search" href="javascript:enter();">찾기</button>
+        
+        // 2. 검색어를 입력하는 부분에는 onkeyup="enter()" 이 코드가 있어야 합니당
+        // <input type="text" id="teaName" class="form-control kw" onkeyup="enter()">
+
+
+
+
+
+
+
+
+
+
+        // 승신 님 함수는 건들지 않겠습니다 아마 수정중이신 것 같아요 !!!!!!! -- 영은 
+
+        /* 찜 좋아요 기능 스크립트 --승신 */
+
+        async function likeTea(name) {
+            let access_token = await get_access_token();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tea/like',
+                data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
+                success: function (response) {
+                    alert(response['msg']);
+                    window.location.reload()
+                }
+            });
+        }
+
+        /* like+scrap 스크립트 */
+
+        /*
+        async function likeTea(name) {
+            let access_token = await get_access_token();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tea/like_all',
+                data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
+                success: function (response) {
+                    if(response['alreadyScrap']) {
+                        alert(response['alreadyScrap']);
+                        window.location.reload()
+                    }
+                    else if(response['successScrap']){
+                        alert(response['successScrap']);
+                        window.location.reload()
+                    }
+                }
+            });
+        }
+
+         */
+
+        async function get_access_token() {
+    let result = await fetch('/get_access_token');
+    let token = '';
+
+    if(result.ok) token = await result.json();
+
+    return token;
+}
+
+        async function scrapTea(name) {
+            let access_token = await get_access_token();
+
+            $.ajax({
+                type: 'POST',
+                url: '/tea/scrap',
+                data: {name_give: name},
+                headers: {"Authorization": "Bearer "+ access_token},
+                success: function (response) {
+
+                    if(response['alreadyScrap']) {
+                        alert(response['alreadyScrap']);
+                        window.location.reload()
+                    }
+                    else if(response['successScrap']){
+                        alert(response['successScrap']);
+                    }
+                }
+            });
+        }
+
+    </script>
 </head>
 
 
@@ -67,3 +353,4 @@
 </body>
 
 </html>
+
