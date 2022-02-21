@@ -7,6 +7,7 @@ from hashlib import *
 import datetime
 import chachaconfig
 import pandas as pd
+import random
 import json
 
 app = Flask(__name__)
@@ -159,8 +160,9 @@ def recommend_page():
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
-    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
+    random.shuffle(tea_List)  # 랜덤 정렬
+    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))  # 이름순 정렬
+    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))  # 추천순 정렬
     return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
 
 # 검색 기능 -- 영은
@@ -169,13 +171,10 @@ def searchTea():
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
 
     keyword_receive = request.get_json()['teaKeyword']
-    print(keyword_receive)
 
     df_search = df_all[df_all['name'].str.contains(keyword_receive)]
-    print(df_search)
 
     find_list = df_search.to_json(orient='records', force_ascii=False)
-    print(find_list)
 
     return jsonify({'search_teas': find_list})
 
