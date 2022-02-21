@@ -37,8 +37,8 @@ from pymongo import MongoClient, ReturnDocument
 # **********************************************************
 
 
-client = MongoClient('localhost', 27017)
-# client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
+# client = MongoClient('localhost', 27017)
+client = MongoClient('mongodb://test:test@52.78.104.136', 27017)
 
 
 db = client.dbchacha
@@ -155,8 +155,10 @@ def recommend_page():
 # ***************************************************************************************************
 @app.route('/tea/list', methods=['GET'])
 def getTea():
-    tea_list = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    return jsonify({'all_teas': tea_list})
+    tea_List = list(db.tealist.find({}, {'_id': False}))
+    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
+    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
+    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
 
 
 @app.route('/tea')
@@ -472,4 +474,10 @@ def sign_page():
 
 # ***************************************************************************************************
 if __name__ == '__main__':
+<<<<<<< HEAD
     app.run('0.0.0.0', port=5000, debug=True)
+=======
+
+   app.run('0.0.0.0',port=5000,debug=True)
+
+>>>>>>> d6433983a6e96c6e75a15cafc25b783710121100

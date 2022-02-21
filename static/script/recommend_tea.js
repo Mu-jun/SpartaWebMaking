@@ -87,8 +87,8 @@ function find_tea() {
                                          <p>${caffeineOX}</p>
                                          <p>${caffeine}</p>
                                          <p>${caution}</p>
-                                         <p><button onclick="likeTea()" class="btn btn-outline-secondary">좋아요</button></p>
-                                         <p><button class="btn btn-outline-secondary">찜</button></p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button> 좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
                         $('#box').append(temp_html)
