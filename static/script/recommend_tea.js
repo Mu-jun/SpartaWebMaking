@@ -64,8 +64,10 @@ function find_tea() {
                     caffeineOX_give : caffeineOX,
                    }),
             success: function (response) {
+
                 $('#box').empty()
                 let Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
+                console.log(Tea)
                 for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
@@ -91,7 +93,7 @@ function find_tea() {
                                          <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
-                        $('#box').append(temp_html)
+                        $('#box').append(temp_html);
                 }
             }
         })
