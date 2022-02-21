@@ -136,11 +136,11 @@ async function sign_checkSign() {
         if(access_payload_exp > numberic_date) {
             isSign = true;
         } else {
-            let refresh_token = await get_access_token();                        
+            let refresh_token = await get_refresh_token();                        
             let refresh_payload_exp = get_payload_exp(refresh_token);            
 
             if(refresh_payload_exp > numberic_date) {
-                refresh();
+                refreshing();
                 isSign = true;
             }
             
