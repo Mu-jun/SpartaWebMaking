@@ -97,7 +97,7 @@ for i in a:
             db.users.update_one({'id': '123'}, {'$set': {'scrap_id': a}}, True)
         return jsonify({'successScrap': '좋아요, 찜 완료.'})
 """
-
+"""
 check_id_list = list(db.users.find({'id': '123'}))[0]['scrap_id']
 a = check_id_list.split(',')
 all_scraps = []
@@ -106,6 +106,9 @@ for i in a:
     print(check_tealist)
     all_scraps.append(check_tealist)
 print(all_scraps)
+"""
+
+db.users.update_one({'id': '345'}, {'$set': {'scrap_id': None}}, True)
 # a = "".join([str(i) for i in check_scrap_id]) # 문자열 만들기
 
 # check_scrap_id = db.users.find_one({'id': '123'})['scrap_id']

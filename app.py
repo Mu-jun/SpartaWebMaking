@@ -190,16 +190,19 @@ def like_all():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
     current_like = target_tea['like']
-    check_scrap_id = list(db.users.find({'id': current_user}))[0]['scrap_id']
-    a = check_scrap_id.split(',')
-    if name_receive in a:
-        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
+
+    new_like = current_like + 1
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    if db.users.find({'id': current_user})[0]['scrap_id'] == None:
+        scrap_id = db.tealist.find_one({'name': name_receive})['name']
+        db.users.update_one({'id': current_user}, {'$set': {'scrap_id': scrap_id}}, True)
+        return jsonify({'successScrap': '좋아요, 찜 완료.'})
+
     else:
-        new_like = current_like + 1
-        db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-        if db.users.find({'id': current_user})[0]['scrap_id'] == None:
-            scrap_id = db.tealist.find_one({'name': name_receive})['name']
-            db.users.update_one({'id': current_user}, {'$set': {'scrap_id': scrap_id}}, True)
+        check_scrap_id = list(db.users.find({'id': current_user}))[0]['scrap_id']
+        a = check_scrap_id.split(',')
+        if name_receive in a:
+            return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
         else:
             scrap_id = db.tealist.find_one({'name': name_receive})['name']
             users_scrap_list = db.users.find({'id': current_user})[0]['scrap_id']
@@ -207,7 +210,7 @@ def like_all():
             a = users_scrap_list + ',' + scrap_id
 
             db.users.update_one({'id': current_user}, {'$set': {'scrap_id': a}}, True)
-        return jsonify({'successScrap': '좋아요, 찜 완료.'})
+            return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
 # ***************************************************************************************************
 
