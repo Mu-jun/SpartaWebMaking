@@ -85,6 +85,9 @@
 
 <button type="button" onclick="find_tea();" class="btn btn-primary btn-save">찾아볼까요</button>
 
+<button type="button" onclick="nameorder();" class="btn btn-primary btn-save">이름순</button>
+<button type="button" onclick="likeorder();" class="btn btn-primary btn-save">좋아요순</button>
+
 <div id="box">
 </div>
 
@@ -156,8 +159,9 @@
             success: function (response) {
 
                 $('#box').empty()
-                let Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
+                Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
                 console.log(Tea)
+
                 for(let i =0; i<Tea.length; i++){
                         let name = Tea[i]['name']
                         let type = Tea[i]['type']
@@ -187,6 +191,86 @@
                 }
             }
         })
+    }
+
+    /* 이름순, 좋아요순 정렬하기 */
+    var sortJSON = function (data, key, type) {
+        if (type == undefined) {
+            type = "asc";
+        }
+        return data.sort(function (a, b) {
+            var x = a[key];
+            var y = b[key];
+            if (type == "desc") {
+                return x > y ? -1 : x < y ? 1 : 0;
+            } else if (type == "asc") {
+                return x < y ? -1 : x > y ? 1 : 0;
+            }
+        });
+    };
+
+    function nameorder() {
+        $('#box').empty()
+        const teabynameorder = sortJSON(Tea, "name", "asc");
+        for (let i = 0; i < Tea.length; i++) {
+            let name = teabynameorder[i]['name']
+            let type = teabynameorder[i]['type']
+            let benefit = teabynameorder[i]['benefit']
+            let caffeineOX = teabynameorder[i]['caffeineOX']
+            let caffeine = teabynameorder[i]['caffeine']
+            let benefitdetail = teabynameorder[i]['benefitdetail']
+            let desc = teabynameorder[i]['desc']
+            let caution = teabynameorder[i]['caution']
+            let img = teabynameorder[i]['img']
+            let like = teabynameorder[i]['like']           /* 좋아요/찜 기능 통합에 따라 like 변수 생존여부 결정 */
+
+            let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button> 좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+            $('#box').append(temp_html);
+        }
+    }
+
+    function likeorder() {
+        $('#box').empty()
+        const teabylikeorder = sortJSON(Tea, "like", "desc");
+        for (let i = 0; i < Tea.length; i++) {
+            let name = teabylikeorder[i]['name']
+            let type = teabylikeorder[i]['type']
+            let benefit = teabylikeorder[i]['benefit']
+            let caffeineOX = teabylikeorder[i]['caffeineOX']
+            let caffeine = teabylikeorder[i]['caffeine']
+            let benefitdetail = teabylikeorder[i]['benefitdetail']
+            let desc = teabylikeorder[i]['desc']
+            let caution = teabylikeorder[i]['caution']
+            let img = teabylikeorder[i]['img']
+            let like = teabylikeorder[i]['like']           /* 좋아요/찜 기능 통합에 따라 like 변수 생존여부 결정 */
+
+            let temp_html = `<p>name : ${name}</p>
+                                         <img class="img-size" src="${img}"/>
+                                         <p>${type}</p>
+                                         <p>${benefit}</p>
+                                         <p>${benefitdetail}</p>
+                                         <p>${desc}</p>
+                                         <p>${caffeineOX}</p>
+                                         <p>${caffeine}</p>
+                                         <p>${caution}</p>
+                                         <p><button onclick="likeTea('${name}')" class="btn btn-outline-secondary">좋아요</button> 좋아요 수 : ${like}</p>
+                                         <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
+                                         <p> ---------------------------------------------------------------------------------------------- </p>
+                                         `
+            $('#box').append(temp_html);
+        }
     }
 
 </script>
