@@ -190,18 +190,23 @@ def like_all():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
     current_like = target_tea['like']
-    check_scrap_id = db.users.find_one({'user_id': current_user})['scrap_id']
-
-
-    if check_scrap_id is not None:
+    check_scrap_id = list(db.users.find({'id': current_user}))[0]['scrap_id']
+    a = check_scrap_id.split(',')
+    if name_receive in a:
         return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
         new_like = current_like + 1
         db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-        scrap_id = db.tealist.find_one({'name': name_receive})
-        id_list = []
-        id_list.append(scrap_id)
-        db.users.update_one({'id': current_user}, {'$set': {'scrap_id': id_list}}, True)
+        if db.users.find({'id': current_user})[0]['scrap_id'] == None:
+            scrap_id = db.tealist.find_one({'name': name_receive})['name']
+            db.users.update_one({'id': current_user}, {'$set': {'scrap_id': scrap_id}}, True)
+        else:
+            scrap_id = db.tealist.find_one({'name': name_receive})['name']
+            users_scrap_list = db.users.find({'id': current_user})[0]['scrap_id']
+
+            a = users_scrap_list + ',' + scrap_id
+
+            db.users.update_one({'id': current_user}, {'$set': {'scrap_id': a}}, True)
         return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
 # ***************************************************************************************************
@@ -210,23 +215,16 @@ def like_all():
 @jwt_required()
 def showScrapTea():
     current_user = get_jwt_identity().upper()
-    check_id_list = db.users.find_one({'user_id': current_user})
+    check_id_list = list(db.users.find({'id': current_user}))[0]['scrap_id']
     if check_id_list is not None:
-        scrap_list = list(db.users.find({'id': '123'}))
-        a = scrap_list[0]['scrap_id']
+        a = check_id_list.split(',')
+        all_scraps = []
         for i in a:
-            b = list(db.tealist.find({'_id': i}))
-        return jsonify({'scrapTeas': b})
+            check_tealist = list(db.tealist.find({'name': i},{'_id':False}))[0]
+            all_scraps.append(check_tealist)
+        return jsonify({'scrapTeas': all_scraps})
     else:
         return jsonify({'msg': '비어있습니다'})
-
-
-@app.route('/tea/deleteScrap', methods=['POST'])
-@jwt_required()
-def delete_scrap():
-    name_receive = request.form['name_give']
-    db.scraps.delete_one({'name': name_receive})
-    return jsonify({'msg': '삭제 완료'})
 
 
 @app.route('/tea/scrapPage')
@@ -490,4 +488,11 @@ def scrapTea():
         scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
         db.scraps.insert_one(scrap_list)
         return jsonify({'successScrap': '찜 완료 되었습니다.'})
+        
+@app.route('/tea/deleteScrap', methods=['POST'])
+@jwt_required()
+def delete_scrap():
+    name_receive = request.form['name_give']
+    db.scraps.delete_one({'name': name_receive})
+    return jsonify({'msg': '삭제 완료'})
 """
