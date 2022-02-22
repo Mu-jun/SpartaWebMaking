@@ -207,7 +207,7 @@ db.tealist.insert_many([
   "desc": "색감이 홍차와 유사해 홍차 대용품으로도 이용되었던 차. 때문에 가향 블렌딩이나 밀크티 등으로 즐기기도 한다. 둥글레차와 비슷한 맛에 설탕 없이조 약간의 단맛이 있으며 뒷맛이 개운하다",
   "caffeineOX": False,
   "caffeine": "0",
-  "caution": "매우 물지만 과다 섭취시 에스트로겐 생성이 증가될 수 있다는 보고가 있다.",
+  "caution": "부작용이 매우 드물지만 과다 섭취시 에스트로겐 생성이 증가될 수 있다는 보고가 있다.",
   "img": "https://s3.ap-northeast-2.amazonaws.com/alphafly.shop/tea_image/etc/%EB%A3%A8%EC%9D%B4%EB%B3%B4%EC%8A%A4.png",
   "like": 0,
   "user_id": None
