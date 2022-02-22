@@ -328,7 +328,7 @@ def checkNickname():
 
     nickname_receive = request.get_json().upper()
 
-    result = db.users.find_one({'id': nickname_receive})
+    result = db.users.find_one({'nickname': nickname_receive})
 
     if result is not None:
         return jsonify({'fail': '사용할 수 없는 별명입니다.'})
@@ -377,7 +377,7 @@ def signup():
 @app.route('/sign/signin', methods=['POST'])
 def api_signin():
     print('signin start')
-    response = make_response(render_template('/sign_test.html'))
+    response = make_response()
     receive = request.get_json();
 
     id_receive = receive['id_give'].upper()
@@ -411,7 +411,7 @@ def api_signin():
 @app.route('/unset_token', methods=['GET'])
 def set_access_token():
     print('unset_token start')
-    response = make_response(render_template('/sign_test.html'))
+    response = make_response()
 
     response.delete_cookie('chachaAccessToken')
     response.delete_cookie('chachaRefreshToken')
