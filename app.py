@@ -1,3 +1,4 @@
+import random
 from urllib import response
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
@@ -7,6 +8,7 @@ from hashlib import *
 import datetime
 import chachaconfig
 import pandas as pd
+import random
 import json
 
 app = Flask(__name__)
@@ -54,21 +56,21 @@ db = client.dbchacha
 def save_tea():
     print(request.is_json)
     tea_receive = request.get_json()
-    name_receive = tea_receive['name_give']  # 차 이름입니다
-    # eng_name_receive = tea_receive['eng_name_give']          # (영문)차 이름입니다 - 사용 않아서 주석처리
-    type_receive = tea_receive['type_give']  # 대분류1 종류
-    eng_type_receive = tea_receive['eng_type_give']  # 대분류1 (영문)종류 - 종류 선택시 자동 입력
-    benefit_receive = tea_receive['benefit_give']  # 대분류2 효능
-    caffeineOX_receive = tea_receive['caffeineOX_give']  # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
-    caffeine_receive = tea_receive['caffeine_give']  # 상세1 카페인 "함량"
-    benefitdetail_receive = tea_receive['benefitdetail_give']  # 상세2 상세효능
-    desc_receive = tea_receive['desc_give']  # 상세2 상세설명
-    caution_receive = tea_receive['caution_give']  # 상세3 주의사항
-    img_receive = tea_receive['img_give']  # 상세4 이미지 주소
+    name_receive = tea_receive['name_give']                     # 차 이름입니다
+    # eng_name_receive = tea_receive['eng_name_give']             # (영문)차 이름입니다 - 사용 않아서 주석처리
+    type_receive = tea_receive['type_give']                     # 대분류1 종류
+    eng_type_receive = tea_receive['eng_type_give']             # 대분류1 (영문)종류 - 종류 선택시 자동 입력
+    benefit_receive = tea_receive['benefit_give']               # 대분류2 효능
+    caffeineOX_receive = tea_receive['caffeineOX_give']         # 대분류3 카페인 "함유여부" Boolean 없으면 False 있으면 True
+    caffeine_receive = tea_receive['caffeine_give']             # 상세1 카페인 "함량"
+    benefitdetail_receive = tea_receive['benefitdetail_give']   # 상세2 상세효능
+    desc_receive = tea_receive['desc_give']                     # 상세2 상세설명
+    caution_receive = tea_receive['caution_give']               # 상세3 주의사항
+    img_receive = tea_receive['img_give']                       # 상세4 이미지 주소
 
     doc = {
         'name': name_receive,
-        # 'eng_name': eng_name_receive, # 영문명 입력 받지 않음에 의해 주석처리
+         # 'eng_name': eng_name_receive,
         'type': type_receive,
         'eng_type': eng_type_receive,
         'benefit': benefit_receive,
@@ -110,17 +112,15 @@ def read_mongo():
     benefit_receive = selector_receive['benefit_give']
     caffeineOX_receive = selector_receive['caffeineOX_give']
 
-    print(type_receive)
-
     # df_type : 전체 데이터프레임(df_all)에서 type이 '같은' 항목들만 받아서 새로 데이터프레임을 만든다.
     df_type = df_all.loc[df_all['type'].isin(type_receive)]
     df_type.head()
 
+    # df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
     # benequery : 데이터프레임에서 어떤 조건으로 검색할지 query문을 만들어주기 위한 문자 함수이다.
     # 입력받는 효능의 갯수가 불확실한 상황에서, DB상의 "효능"란에 입력받은 값이 '포함' 되는지를 비교할 기능을 찾지 못했다.
     # 우리가 입력받은 효능 값의 개수만큼 for 문을 돌려서 아래와 같이 query 문을 만들었다.
     # 예시: (@df_type['benefit'].str.contains ('다이어트')) or (@df_type['benefit'].str.contains('피부미용'))
-
     benequery = f"(@df_type['benefit'].str.contains ('"
     for i in range(len(benefit_receive)):
         if i < len(benefit_receive) - 1:
@@ -128,8 +128,6 @@ def read_mongo():
         else:
             benequery += benefit_receive[i] + f"'))"
     print(benequery)
-
-    # df_benefit : type 으로 걸러낸 데이터프레임(df_type) 중에서, benefit이 맞는 정보들만 받아서 새로운 데이터프레임을 만든다.
     df_benefit = df_type.query(benequery)
     df_benefit.head()
 
@@ -142,11 +140,9 @@ def read_mongo():
 
     return jsonify({'find_teas': find_list})
 
-
 @app.route('/recommend')  # 검색창 부분 건드리지 않으려고 우선 따로 만들어봄, 병합시 삭제 또는 수정
 def recommend_page():
     return render_template('recommend_tea.html')
-
 
 # ***************************************************************************************************
 
@@ -159,9 +155,8 @@ def recommend_page():
 @app.route('/tea/list', methods=['GET'])
 def getTea():
     tea_List = list(db.tealist.find({}, {'_id': False}))
-    sort_Name = list(db.tealist.find({}, {'_id': False}).sort('name'))
-    sort_Like = list(db.tealist.find({}, {'_id': False}).sort('like', -1))
-    return jsonify({'all_teas':tea_List,'teas_name':sort_Name,'teas_like':sort_Like})
+    random.shuffle(tea_List)  # 랜덤 정렬
+    return jsonify({'all_teas':tea_List})
 
 # 검색 기능 -- 영은
 @app.route('/tea/search', methods=['POST'])
@@ -169,13 +164,10 @@ def searchTea():
     df_all = pd.DataFrame(list(db.tealist.find({}, {'_id': False})))
 
     keyword_receive = request.get_json()['teaKeyword']
-    print(keyword_receive)
 
     df_search = df_all[df_all['name'].str.contains(keyword_receive)]
-    print(df_search)
 
     find_list = df_search.to_json(orient='records', force_ascii=False)
-    print(find_list)
 
     return jsonify({'search_teas': find_list})
 
@@ -183,45 +175,6 @@ def searchTea():
 @app.route('/tea')
 def teaList():
     return render_template('get_tea.html')
-
-
-# ***************************************************************************************************
-
-# like --승신
-# ***************************************************************************************************
-@app.route('/tea/like', methods=['POST'])
-@jwt_required()
-def likeTea():
-    name_receive = request.form['name_give']
-    target_tea = db.tealist.find_one({'name': name_receive})
-    current_like = target_tea['like']
-
-    new_like = current_like + 1
-
-    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-    return jsonify({'msg': 'like +1'})
-
-
-# ***************************************************************************************************
-
-# scrap --승신
-# 찜 오류 해결 (해결하고나서 보니 매우 간단하게 해결 가능했다는 점이 빡침 포인트)
-# ***************************************************************************************************
-@app.route('/tea/scrap', methods=['POST'])
-@jwt_required()
-def scrapTea():
-    current_user = get_jwt_identity().upper()
-    name_receive = request.form['name_give']
-    check_scrap_name = db.scraps.find_one({'name': name_receive})
-    check_scrap_id = db.scraps.find_one({'user_id': current_user})
-
-    if check_scrap_id == current_user:
-        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
-    else:
-        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
-        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
-        db.scraps.insert_one(scrap_list)
-        return jsonify({'successScrap': '찜 완료 되었습니다.'})
 
 
 # ***************************************************************************************************
@@ -237,20 +190,27 @@ def like_all():
     name_receive = request.form['name_give']
     target_tea = db.tealist.find_one({'name': name_receive})
     current_like = target_tea['like']
-    check_scrap_name = db.scraps.find_one({'name': name_receive})
-    check_scrap_id = db.scraps.find_one({'user_id': current_user})
 
+    new_like = current_like + 1
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    if db.users.find({'id': current_user})[0]['scrap_id'] == None:
+        scrap_id = db.tealist.find_one({'name': name_receive})['name']
+        db.users.update_one({'id': current_user}, {'$set': {'scrap_id': scrap_id}}, True)
+        return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
-    if check_scrap_name and check_scrap_id is not None:
-        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
     else:
-        new_like = current_like + 1
-        db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
-        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
-        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
-        db.scraps.insert_one(scrap_list)
-        return jsonify({'successScrap': '찜 완료 되었습니다.'})
+        check_scrap_id = list(db.users.find({'id': current_user}))[0]['scrap_id']
+        a = check_scrap_id.split(',')
+        if name_receive in a:
+            return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
+        else:
+            scrap_id = db.tealist.find_one({'name': name_receive})['name']
+            users_scrap_list = db.users.find({'id': current_user})[0]['scrap_id']
 
+            a = users_scrap_list + ',' + scrap_id
+
+            db.users.update_one({'id': current_user}, {'$set': {'scrap_id': a}}, True)
+            return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
 # ***************************************************************************************************
 
@@ -258,20 +218,16 @@ def like_all():
 @jwt_required()
 def showScrapTea():
     current_user = get_jwt_identity().upper()
-    my_scrap_list = db.scraps.find_one({'user_id': current_user})
-    if my_scrap_list is not None:
-        scrap_list = list(db.scraps.find({'user_id': current_user}, {'_id': False}).sort("name"))
-        return jsonify({'scrapTeas': scrap_list})
+    check_id_list = list(db.users.find({'id': current_user}))[0]['scrap_id']
+    if check_id_list is not None:
+        a = check_id_list.split(',')
+        all_scraps = []
+        for i in a:
+            check_tealist = list(db.tealist.find({'name': i},{'_id':False}))[0]
+            all_scraps.append(check_tealist)
+        return jsonify({'scrapTeas': all_scraps})
     else:
         return jsonify({'msg': '비어있습니다'})
-
-
-@app.route('/tea/deleteScrap', methods=['POST'])
-@jwt_required()
-def delete_scrap():
-    name_receive = request.form['name_give']
-    db.scraps.delete_one({'name': name_receive})
-    return jsonify({'msg': '삭제 완료'})
 
 
 @app.route('/tea/scrapPage')
@@ -283,31 +239,6 @@ def scrapPage():
 
 # ***************************************************************************************************
 # mu-jun's function code
-
-#get nickname
-@app.route('/sign/getNickname', methods=['GET'])
-@jwt_required()
-def getNickname():
-    print('getNickname start')
-
-    id_receive = get_jwt_identity().upper()
-    user = db.users.find_one({'id': id_receive})        
-    
-    return jsonify({'nickname':user['nickname']})
-    
-#check admin
-@app.route('/sign/checkAdmin', methods=['GET'])
-@jwt_required()
-def checkAdmin():
-    print('checkAdmin start')
-
-    id_receive = get_jwt_identity().upper()
-    user = db.users.find_one({'id': id_receive})
-        
-    if user['isAdmin']:
-        return jsonify({'check':True})
-    else:
-        return jsonify({'check':False})
 
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
@@ -321,6 +252,7 @@ def checkID():
         return jsonify({'fail': '사용할 수 없는 ID입니다.'})
     else:
         return jsonify({'success': '사용 가능한 ID입니다.'})
+
 
 @app.route('/sign/checkNickname', methods=['POST'])
 def checkNickname():
@@ -430,12 +362,13 @@ def api_get_access_token():
     else:
         return jsonify(None)
 
+
 @app.route('/get_refresh_token', methods=['GET'])
 def api_get_refresh_token():
     print('get_refresh_token start')
 
     result = request.cookies.get('chachaRefreshToken')
-    
+    print(result)
     if result is not None:
         return jsonify(result)
     else:
@@ -446,13 +379,10 @@ def api_get_refresh_token():
 @jwt_required(refresh=True)
 def refresh():
     print('refresh start')
-    response = make_response()
+
     current_user = get_jwt_identity()
-    
     access_token = create_access_token(identity=current_user)
-    set_access_cookies(response,access_token)
-    
-    return response
+    return jsonify(access_token=access_token, current_user=current_user)
 
 
 # sign information 유저정보변경
@@ -520,3 +450,52 @@ def sign_page():
 # ***************************************************************************************************
 if __name__ == '__main__':
     app.run('0.0.0.0',port=5000,debug=True)
+
+# 안 쓰는데 혹시나 해서 남겨둔 예전 like & scrap *********************************************************
+
+"""
+# ***************************************************************************************************
+
+# like --승신
+# ***************************************************************************************************
+@app.route('/tea/like', methods=['POST'])
+@jwt_required()
+def likeTea():
+    name_receive = request.form['name_give']
+    target_tea = db.tealist.find_one({'name': name_receive})
+    current_like = target_tea['like']
+
+    new_like = current_like + 1
+
+    db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
+    return jsonify({'msg': 'like +1'})
+
+
+# ***************************************************************************************************
+
+# scrap --승신
+# 찜 오류 해결 (해결하고나서 보니 매우 간단하게 해결 가능했다는 점이 빡침 포인트)
+# ***************************************************************************************************
+@app.route('/tea/scrap', methods=['POST'])
+@jwt_required()
+def scrapTea():
+    current_user = get_jwt_identity().upper()
+    name_receive = request.form['name_give']
+    check_scrap_name = db.scraps.find_one({'name': name_receive})
+    check_scrap_id = db.scraps.find_one({'user_id': current_user})
+
+    if check_scrap_id == current_user:
+        return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
+    else:
+        db.tealist.update_one({'name': name_receive}, {'$set': {'user_id': current_user}}, True)
+        scrap_list = db.tealist.find_one({'name': name_receive}, {'_id': False})
+        db.scraps.insert_one(scrap_list)
+        return jsonify({'successScrap': '찜 완료 되었습니다.'})
+        
+@app.route('/tea/deleteScrap', methods=['POST'])
+@jwt_required()
+def delete_scrap():
+    name_receive = request.form['name_give']
+    db.scraps.delete_one({'name': name_receive})
+    return jsonify({'msg': '삭제 완료'})
+"""

@@ -32,7 +32,7 @@
         }
 
         let name = $('#name').val()                         /* 차이름 */
-        /*let eng_name = $('#eng_name').val()                  영문명 */
+        let eng_name = $('#eng_name').val()                 /* 영문명 */
         let benefit = result                                /* 효능 */
         let caffeine = $('#caffeine').val()                 /* 카페인함유량 */
         var caffeineOX = Boolean(caffeine)                  /* 카페인함유여부 */
@@ -48,7 +48,7 @@
             dataType: 'json',
             data: JSON.stringify({
                 name_give: name,
-                /*eng_name_give: eng_name,*/
+                eng_name_give: eng_name,
                 type_give: type,
                 eng_type_give: eng_type,
                 benefit_give: benefit,
