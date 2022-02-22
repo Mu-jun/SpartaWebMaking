@@ -196,22 +196,15 @@ function save_tea() {
         let type = $('#type option:selected').val()         /* 종류 */
 
         /* 차 종류(영문)처리 부분 */
-        if (type === "대용차") {
-            var eng_type = "ETC";
-        } else if (type === "홍차") {
-            var eng_type = "Black Tea";
-        } else if (type === "녹차") {
-            var eng_type = "Green Tea";
-        } else if (type === "홍차") {
-            var eng_type = "Black Tea";
-        } else if (type === "백차") {
-            var eng_type = "White Tea";
-        } else if (type === "청차") {
-            var eng_type = "Dark Green Tea";
-        } else if (type === "황차") {
-            var eng_type = "Yellow Tea";
-        } else if (type === "흑차") {
-            var eng_type = "Dark Tea";
+
+        let engtypes = ['ETC', 'Black Tea', 'Green Tea', 'White Tea', 'Dark Green Tea', 'Yellow Tea', 'Dark Tea']
+        let types = ['대용차', '홍차', '녹차', '백차', '청차', '황차', '흑차']
+        let eng_type=""
+        for (i=0; i<7; i++){
+            if (type==types[i]){
+                eng_type = engtypes[i];
+                break;
+            }
         }
 
         let name = $('#name').val()                         /* 차이름 */
