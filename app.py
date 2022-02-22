@@ -199,11 +199,11 @@ def like_all():
         return jsonify({'successScrap': '좋아요, 찜 완료.'})
 
     else:
-        new_like = current_like
-        db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
         check_scrap_id = list(db.users.find({'id': current_user}))[0]['scrap_id']
         a = check_scrap_id.split(',')
         if name_receive in a:
+            new_like = current_like
+            db.tealist.update_one({'name': name_receive}, {'$set': {'like': new_like}})
             return jsonify({'alreadyScrap': '이미 찜 하셨습니다.'})
         else:
             scrap_id = db.tealist.find_one({'name': name_receive})['name']
