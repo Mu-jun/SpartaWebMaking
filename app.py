@@ -296,7 +296,8 @@ def signup():
     doc = {
         'id': id_receive,
         'password': hashed_password,
-        'nickname': nickname_receive
+        'nickname': nickname_receive,
+        'scrap_id': None
     }
 
     print(doc)

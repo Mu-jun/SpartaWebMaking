@@ -108,7 +108,7 @@ for i in a:
 print(all_scraps)
 """
 
-db.users.update_one({'id': '345'}, {'$set': {'scrap_id': None}}, True)
+db.users.update_one({'id': '456'}, {'$set': {'scrap_id': None}}, True)
 # a = "".join([str(i) for i in check_scrap_id]) # 문자열 만들기
 
 # check_scrap_id = db.users.find_one({'id': '123'})['scrap_id']
