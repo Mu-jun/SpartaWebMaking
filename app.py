@@ -290,31 +290,6 @@ def scrapPage():
 # ***************************************************************************************************
 # mu-jun's function code
 
-#get nickname
-@app.route('/sign/getNickname', methods=['GET'])
-@jwt_required()
-def getNickname():
-    print('getNickname start')
-
-    id_receive = get_jwt_identity().upper()
-    user = db.users.find_one({'id': id_receive})        
-    
-    return jsonify({'nickname':user['nickname']})
-    
-#check admin
-@app.route('/sign/checkAdmin', methods=['GET'])
-@jwt_required()
-def checkAdmin():
-    print('checkAdmin start')
-
-    id_receive = get_jwt_identity().upper()
-    user = db.users.find_one({'id': id_receive})
-        
-    if user['isAdmin']:
-        return jsonify({'check':True})
-    else:
-        return jsonify({'check':False})
-
 #  signup
 @app.route('/sign/checkID', methods=['POST'])
 def checkID():
@@ -461,7 +436,7 @@ def refresh():
     return response
 
 
-# sign information 유저정보변경
+# sign information 유저정보
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
@@ -516,6 +491,31 @@ def api_delete_user():
     else:
         print('fail1')
         return jsonify({'fail': '로그인 먼저 해주세요.'})
+
+#get nickname
+@app.route('/sign/getNickname', methods=['GET'])
+@jwt_required()
+def getNickname():
+    print('getNickname start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})        
+    
+    return jsonify({'nickname':user['nickname']})
+    
+#check admin
+@app.route('/sign/checkAdmin', methods=['GET'])
+@jwt_required()
+def checkAdmin():
+    print('checkAdmin start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})
+        
+    if user['isAdmin']:
+        return jsonify({'check':True})
+    else:
+        return jsonify({'check':False})
 
 
 @app.route('/sign_test')
