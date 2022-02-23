@@ -128,6 +128,13 @@
         function search(){
             let count = 0; // 검색된 차 개수
             let teaKeyword = $('#teaName').val(); // 검색어
+
+            // 검색어 길이 제한
+            if(teaKeyword.length < 2){
+                alert("검색어는 2글자 이상 입력해주세요!♥");
+                return false;
+            }
+
             $.ajax({
                 type: "POST",
                 url: "/tea/search",

@@ -1,4 +1,4 @@
-import random
+
 from urllib import response
 from flask import Flask, render_template, request, jsonify, make_response
 from flask_jwt_extended import *
@@ -165,9 +165,15 @@ def searchTea():
 
     keyword_receive = request.get_json()['teaKeyword']
 
-    df_search = df_all[df_all['name'].str.contains(keyword_receive)]
+    df_search = df_all[
+        df_all['name'].str.contains(keyword_receive) | df_all['type'].str.contains(keyword_receive)
+        | df_all['benefit'].str.contains(keyword_receive) | df_all['benefitdetail'].str.contains(keyword_receive)
+        | df_all['caution'].str.contains(keyword_receive) | df_all['desc'].str.contains(keyword_receive)
+        | df_all['eng_name'].str.contains(keyword_receive) | df_all['eng_type'].str.contains(keyword_receive)
+    ]
 
-    find_list = df_search.to_json(orient='records', force_ascii=False)
+    df_list = df_search.drop_duplicates(['name']) # 중복제거
+    find_list = df_list.to_json(orient='records', force_ascii=False)
 
     return jsonify({'search_teas': find_list})
 
