@@ -85,6 +85,9 @@
 
 <button type="button" onclick="find_tea();" class="btn btn-primary btn-save">찾아볼까요</button>
 
+<button type="button" onclick="nameorder();" class="btn btn-primary btn-save">이름순</button>
+<button type="button" onclick="likeorder();" class="btn btn-primary btn-save">좋아요순</button>
+
 <div id="box">
 </div>
 
@@ -156,21 +159,57 @@
             success: function (response) {
 
                 $('#box').empty()
-                let Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
-                console.log(Tea)
-                for(let i =0; i<Tea.length; i++){
-                        let name = Tea[i]['name']
-                        let type = Tea[i]['type']
-                        let benefit = Tea[i]['benefit']
-                        let caffeineOX = Tea[i]['caffeineOX']
-                        let caffeine = Tea[i]['caffeine']
-                        let benefitdetail = Tea[i]['benefitdetail']
-                        let desc = Tea[i]['desc']
-                        let caution = Tea[i]['caution']
-                        let img = Tea[i]['img']
-                        let like = Tea[i]['like']           /* 좋아요/찜 기능 통합에 따라 like 변수 생존여부 결정 */
+                Tea = JSON.parse(response['find_teas'])   /*서버에서 string으로 들어와서 JSON.parse 사용*/
+                teabyorder = Tea
+                printbyorder();   /* 별도의 정렬 없이 화면출력 함수로 직행 */
+            }
+        })
+    }
 
-                        let temp_html = `<p>name : ${name}</p>
+    /* 이름순, 좋아요순 정렬하기 위한 함수 선언 */
+    var sortJSON = function (data, key, type) {
+        if (type == undefined) {
+            type = "asc";
+        }
+        return data.sort(function (a, b) {
+            var x = a[key];
+            var y = b[key];
+            if (type == "desc") {
+                return x > y ? -1 : x < y ? 1 : 0;
+            } else if (type == "asc") {
+                return x < y ? -1 : x > y ? 1 : 0;
+            }
+        });
+    };
+
+    /* 이름순 정렬하기 */
+    function nameorder() {
+        teabyorder = sortJSON(Tea, "name", "asc");
+        printbyorder();
+    }
+
+    /* 좋아요순 정렬하기 */
+    function likeorder() {
+        teabyorder = sortJSON(Tea, "like", "desc");
+        printbyorder();
+    }
+
+    /* 화면출력 함수 */
+    function printbyorder() {
+    $('#box').empty()
+        for (let i = 0; i < Tea.length; i++) {
+            let name = teabyorder[i]['name']
+            let type = teabyorder[i]['type']
+            let benefit = teabyorder[i]['benefit']
+            let caffeineOX = teabyorder[i]['caffeineOX']
+            let caffeine = teabyorder[i]['caffeine']
+            let benefitdetail = teabyorder[i]['benefitdetail']
+            let desc = teabyorder[i]['desc']
+            let caution = teabyorder[i]['caution']
+            let img = teabyorder[i]['img']
+            let like = teabyorder[i]['like']           /* 좋아요/찜 기능 통합에 따라 like 변수 생존여부 결정 */
+
+            let temp_html = `<p>name : ${name}</p>
                                          <img class="img-size" src="${img}"/>
                                          <p>${type}</p>
                                          <p>${benefit}</p>
@@ -183,12 +222,9 @@
                                          <p><button onclick="scrapTea('${name}')" class="btn btn-outline-secondary">찜</button></p>
                                          <p> ---------------------------------------------------------------------------------------------- </p>
                                          `
-                        $('#box').append(temp_html);
-                }
-            }
-        })
+            $('#box').append(temp_html);
+        }
     }
-
 </script>
 
 </body>
