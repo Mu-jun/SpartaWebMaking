@@ -466,6 +466,20 @@ def api_delete_user():
         print('fail1')
         return jsonify({'fail': '로그인 먼저 해주세요.'})
 
+#check admin
+@app.route('/sign/checkAdmin', methods=['GET'])
+@jwt_required()
+def checkAdmin():
+    print('checkAdmin start')
+
+    id_receive = get_jwt_identity().upper()
+    user = db.users.find_one({'id': id_receive})
+        
+    if user['isAdmin']:
+        return jsonify({'check':True})
+    else:
+        return jsonify({'check':False})
+
 
 @app.route('/sign_test')
 def sign_page():
