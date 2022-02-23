@@ -312,28 +312,29 @@ def api_signin():
     response = make_response()
     receive = request.get_json();
 
-    id_receive = receive['id_give'].upper()
+    id_receive = receive['id_give']
     pass_receive = receive['pass_give']
 
-    print(id_receive)
-
-    hashed_password = hash_pass(pass_receive, id_receive)
-
-    user = db.users.find_one({'id': id_receive})
+    user_id = id_receive.upper()
+    hashed_password = hash_pass(pass_receive, user_id)
+    user = db.users.find_one({'id': user_id})
     print(user)
 
     if (user):
         if (hashed_password == user['password']):
             response = jsonify({'success': '환영합니다.' + user['nickname'] + '님'})
-
-            access_token = create_access_token(identity=user['id'])
+            print('passOk')
+            access_token = create_access_token(identity=id_receive)
             #response.set_cookie('chachaAccessToken', value=access_token, samesite=None, httponly=True)
             set_access_cookies(response,access_token)
-            refresh_token = create_refresh_token(identity=user['id'])
+            refresh_token = create_refresh_token(identity=id_receive)
             #response.set_cookie('chachaRefreshToken', value=refresh_token, samesite=None, httponly=True)
             set_refresh_cookies(response,refresh_token)
 
             return response
+        else:
+            print('passNo')
+            return jsonify({'fail': 'ID와 비밀번호를 확인해주세요.'})
     else:
         return jsonify({'fail': 'ID와 비밀번호를 확인해주세요.'})
 
@@ -341,7 +342,7 @@ def api_signin():
 # cookie 토큰관리
 
 @app.route('/unset_token', methods=['GET'])
-def set_access_token():
+def unset_token():
     print('unset_token start')
     response = make_response()
 
@@ -379,13 +380,28 @@ def api_get_refresh_token():
 @jwt_required(refresh=True)
 def refresh():
     print('refresh start')
-
+    response = make_response()
     current_user = get_jwt_identity()
     access_token = create_access_token(identity=current_user)
-    return jsonify(access_token=access_token, current_user=current_user)
+    set_access_cookies(response, access_token)
+    refresh_token = create_refresh_token(identity=current_user)
+    set_refresh_cookies(response, refresh_token)
+
+    return response
 
 
-# sign information 유저정보변경
+# sign information 유저정보
+@app.route('/sign/getNickname', methods=['GET'])
+@jwt_required()
+def api_getNickname():
+    print('get Nickname start')
+    current_user = get_jwt_identity().upper()
+    print(current_user)
+    
+    user = db.users.find_one({'id': current_user})
+    
+    return jsonify({'nickname':user['nickname']})
+
 @app.route('/sign/change_pass', methods=['POST'])
 @jwt_required()
 def api_change_pass():
@@ -444,7 +460,7 @@ def api_delete_user():
 
 @app.route('/sign_test')
 def sign_page():
-    return render_template('sign_test.html')
+    return render_template('login.html')
 
 
 # ***************************************************************************************************
